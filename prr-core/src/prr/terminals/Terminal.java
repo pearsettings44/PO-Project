@@ -24,8 +24,6 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canEndCurrentCommunication() {
                 // FIXME add implementation code
-                // so para correr
-                return false;
         }
 
         /**
@@ -35,7 +33,5 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canStartCommunication() {
                 // FIXME add implementation code
-                // so para correr
-                return false;
         }
 }
