@@ -2,7 +2,14 @@ package prr;
 
 import java.io.Serializable;
 import java.io.IOException;
+
+import prr.Clients.Client;
 import prr.exceptions.UnrecognizedEntryException;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+import prr.terminals.Terminal;;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
