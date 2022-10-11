@@ -28,7 +28,7 @@ public class Client implements Serializable {
     /** Client level */
     private Level _level;
 
-        /**
+    /**
      * Constructor.
      * 
      * @param id         the client's id
@@ -38,13 +38,14 @@ public class Client implements Serializable {
      * @param debts      total debts of this client
      * @param notifiable notifications setting
      */
-    Client(String id, String name, int nif, float payments, float debts, boolean notifiable) {
+    Client(String id, String name, int nif) {
         _id = id;
         _name = name;
         _nif = nif;
-        _payments = payments;
-        _debts = debts;
-        _notifiable = notifiable;
+        _level = new NormalLevelClient();
+        _payments = 0;
+        _debts = 0;
+        _notifiable = true;
     }
 
     /**
