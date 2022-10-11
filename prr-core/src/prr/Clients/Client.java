@@ -9,18 +9,26 @@ public class Client implements Serializable {
 
     /** The client's id. */
     private String _id;
+
     /** The client's name. */
     private String _name;
+
     /** The client's tax id number. */
     private int _nif;
+
     /** Total payments made by this client. */
     private float _payments;
+
     /** Total debts of this client. */
     private float _debts;
+
     /** Notifications setting. */
     private boolean _notifiable;
 
-    /**
+    /** Client level */
+    private Level _level;
+
+        /**
      * Constructor.
      * 
      * @param id         the client's id
@@ -79,5 +87,10 @@ public class Client implements Serializable {
      */
     public boolean getNotifiable() {
         return _notifiable;
+    }
+
+    public abstract class Level implements Serializable {
+        // FIXME define serial number
+
     }
 }
