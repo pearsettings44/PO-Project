@@ -7,10 +7,10 @@ import java.io.Serializable;
 /**
  * Abstract terminal.
  */
-abstract public class Terminal implements Serializable /* FIXME maybe addd more interfaces */{
+abstract public class Terminal implements Serializable /* FIXME maybe addd more interfaces */ {
 
-	/** Serial number for serialization. */
-	private static final long serialVersionUID = 202208091753L;
+        /** Serial number for serialization. */
+        private static final long serialVersionUID = 202208091753L;
 
         // FIXME define attributes
         // FIXME define contructor(s)
@@ -19,11 +19,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /**
          * Checks if this terminal can end the current interactive communication.
          *
-         * @return true if this terminal is busy (i.e., it has an active interactive communication) and
-         *          it was the originator of this communication.
+         * @return true if this terminal is busy (i.e., it has an active interactive
+         *         communication) and
+         *         it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
                 // FIXME add implementation code
+                // so para correr
+                return false;
         }
 
         /**
@@ -33,5 +36,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canStartCommunication() {
                 // FIXME add implementation code
+                // so para correr
+                return false;
         }
 }
