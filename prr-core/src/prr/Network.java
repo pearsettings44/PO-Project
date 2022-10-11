@@ -45,5 +45,6 @@ public class Network implements Serializable {
 
 	public void registerClient(String key, String name, String taxID){
 		Client client = new Client(key, name, taxID);
+		this._clients.put(key, client);
 	}
 }
