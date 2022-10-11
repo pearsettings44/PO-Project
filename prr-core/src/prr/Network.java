@@ -9,7 +9,7 @@ import prr.exceptions.UnrecognizedEntryException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import prr.terminals.Terminal;;
+import prr.terminals.Terminal;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -41,5 +41,9 @@ public class Network implements Serializable {
 	 */
 	void importFile(String filename) throws UnrecognizedEntryException, IOException /* FIXME maybe other exceptions */ {
 		// FIXME implement method
+	}
+
+	public void registerClient(String key, String name, String taxID){
+		Client client = new Client(key, name, taxID);
 	}
 }

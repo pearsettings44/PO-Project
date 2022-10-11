@@ -14,7 +14,7 @@ public class Client implements Serializable {
     private String _name;
 
     /** The client's tax id number. */
-    private int _nif;
+    private String _taxId;
 
     /** Total payments made by this client. */
     private float _payments;
@@ -26,23 +26,23 @@ public class Client implements Serializable {
     private boolean _notifiable;
 
     /** Client level */
-    private Level _level;
+    /* private Level _level; */
 
     /**
      * Constructor.
      * 
      * @param id         the client's id
      * @param name       the client's name
-     * @param nif        the client's tax id number
+     * @param taxId      the client's tax id number
      * @param payments   total payments made by this client
      * @param debts      total debts of this client
      * @param notifiable notifications setting
      */
-    Client(String id, String name, int nif) {
+    public Client(String id, String name, String taxId) {
         _id = id;
         _name = name;
-        _nif = nif;
-        _level = new NormalLevelClient();
+        _taxId = taxId;
+/*         _level = new NormalLevelClient(); */
         _payments = 0;
         _debts = 0;
         _notifiable = true;
@@ -65,8 +65,8 @@ public class Client implements Serializable {
     /**
      * @return the client's tax id number
      */
-    public int getNif() {
-        return _nif;
+    public String getTaxId() {
+        return _taxId;
     }
 
     /**
@@ -90,8 +90,8 @@ public class Client implements Serializable {
         return _notifiable;
     }
 
-    public abstract class Level implements Serializable {
+/*     public abstract class Level implements Serializable {
         // FIXME define serial number
 
-    }
+    } */
 }
