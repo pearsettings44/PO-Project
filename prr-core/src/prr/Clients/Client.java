@@ -96,4 +96,10 @@ public class Client implements Serializable {
      * 
      * }
      */
+
+    @Override
+    public String toString() {
+        return String.format("CLIENT|%s|%s|%s|%s|%s|%s", _key, _name, _taxId,
+                _notifiable ? "YES" : "NO", Math.round(_payments), Math.round(_debts));
+    }
 }

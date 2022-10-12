@@ -7,6 +7,7 @@ import prr.Clients.Client;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -58,5 +59,9 @@ public class Network implements Serializable {
 		}
 		Client client = new Client(key, name, taxID);
 		this._clients.put(key, client);
+	}
+
+	public Collection<Client> clients() {
+		return _clients.values();
 	}
 }
