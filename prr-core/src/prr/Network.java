@@ -61,6 +61,10 @@ public class Network implements Serializable {
 		this._clients.put(key, client);
 	}
 
+	/**
+	 * 
+	 * @return all clients
+	 */
 	public Collection<Client> clients() {
 		return _clients.values();
 	}
