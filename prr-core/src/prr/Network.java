@@ -3,7 +3,7 @@ package prr;
 import java.io.Serializable;
 import java.io.IOException;
 
-import prr.Clients.Client;
+import prr.clients.Client;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 

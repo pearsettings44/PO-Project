@@ -1,4 +1,4 @@
-package prr.Clients;
+package prr.clients;
 
 import java.io.Serializable;
 
@@ -26,7 +26,7 @@ public class Client implements Serializable {
     private boolean _notifiable;
 
     /** Client level */
-    /* private Level _level; */
+    private Level _level;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ public class Client implements Serializable {
         _key = key;
         _name = name;
         _taxId = taxId;
-        /* _level = new NormalLevelClient(); */
+        _level = new NormalLevelClient(this);
         _payments = 0;
         _debts = 0;
         _notifiable = true;
@@ -90,16 +90,15 @@ public class Client implements Serializable {
         return _notifiable;
     }
 
-    /*
-     * public abstract class Level implements Serializable {
-     * // FIXME define serial number
-     * 
-     * }
-     */
+    public abstract class Level implements Serializable {
+        private static final long serialVersionUID = 202210121157L;
+
+        public abstract String getName();
+    }
 
     @Override
     public String toString() {
-        return String.format("CLIENT|%s|%s|%s|%s|%s|%s", _key, _name, _taxId,
-                _notifiable ? "YES" : "NO", Math.round(_payments), Math.round(_debts));
+        return String.format("CLIENT|%s|%s|%s|%s|%s|%s|%S", _key, _name, _taxId,
+                _level.getName() , _notifiable ? "YES" : "NO", Math.round(_payments), Math.round(_debts));
     }
 }
