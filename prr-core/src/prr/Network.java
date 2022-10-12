@@ -6,6 +6,7 @@ import java.io.IOException;
 import prr.clients.Client;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.UnrecognizedEntryException;
+import prr.exceptions.UnknownClientKeyException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -67,5 +68,41 @@ public class Network implements Serializable {
 	 */
 	public Collection<Client> clients() {
 		return _clients.values();
+	}
+
+	/**
+	 * Disable client notifications.
+	 * 
+	 * @param key client key
+	 * @throws UnknownClientKeyException if client key does not exist
+	 */
+	public void disableClientNotifications(String key) throws UnknownClientKeyException {
+		Client client = _clients.get(key);
+		if (client != null) {
+			if (client.getNotifiable() == true)
+				client.disableNotifiable();
+			else
+				System.out.println("Client notifications are already disabled.");
+		} else {
+			throw new UnknownClientKeyException(key);
+		}
+	}
+
+	/**
+	 * Enable client notifications.
+	 * 
+	 * @param key client key
+	 * @throws UnknownClientKeyException if client key does not exist
+	 */
+	public void enableClientNotifications(String key) throws UnknownClientKeyException {
+		Client client = _clients.get(key);
+		if (client != null) {
+			if (client.getNotifiable() == false)
+				client.enableNotifiable();
+			else
+				System.out.println("Client already has notifications enabled");
+		} else {
+			throw new UnknownClientKeyException(key);
+		}
 	}
 }

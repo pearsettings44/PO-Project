@@ -98,6 +98,20 @@ public class Client implements Serializable {
         return _notifiable;
     }
 
+    /**
+     * disable client notifications
+     */
+    public void disableNotifiable() {
+        _notifiable = false;
+    }
+
+    /**
+     * enable client notifications
+     */
+    public void enableNotifiable() {
+        _notifiable = true;
+    }
+
     public abstract class Level implements Serializable {
         private static final long serialVersionUID = 202210121157L;
 
