@@ -12,11 +12,11 @@ public class UnavailableFileException extends Exception {
 	String _filename;
 
 	/**
-	 * @param filename 
+	 * @param filename
 	 */
 	public UnavailableFileException(String filename) {
-	  super("Erro a processar ficheiro " + filename);
-	  _filename = filename;
+		super("Erro a processar ficheiro " + filename);
+		_filename = filename;
 	}
 
 	/**

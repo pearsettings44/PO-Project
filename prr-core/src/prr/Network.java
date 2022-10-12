@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.io.IOException;
 
 import prr.Clients.Client;
+import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 
 import java.util.Map;
@@ -43,7 +44,18 @@ public class Network implements Serializable {
 		// FIXME implement method
 	}
 
-	public void registerClient(String key, String name, String taxID){
+	/**
+	 * Register new client.
+	 * 
+	 * @param key   client key
+	 * @param name  client name
+	 * @param taxId client tax id
+	 * @throws DuplicateClientKeyException if client key already exists
+	 */
+	public void registerClient(String key, String name, String taxID) throws DuplicateClientKeyException {
+		if (_clients.containsKey(key)) {
+			throw new DuplicateClientKeyException(key);
+		}
 		Client client = new Client(key, name, taxID);
 		this._clients.put(key, client);
 	}

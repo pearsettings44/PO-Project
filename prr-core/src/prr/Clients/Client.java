@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class Client implements Serializable {
 
     /** Serial number for serialization. */
-    // FIXME define serial number
+    private static final long serialVersionUID = 202210121030L;
 
-    /** The client's id. */
-    private String _id;
+    /** The client's key. */
+    private String _key;
 
     /** The client's name. */
     private String _name;
@@ -31,28 +31,28 @@ public class Client implements Serializable {
     /**
      * Constructor.
      * 
-     * @param id         the client's id
+     * @param key        the client's key
      * @param name       the client's name
      * @param taxId      the client's tax id number
      * @param payments   total payments made by this client
      * @param debts      total debts of this client
      * @param notifiable notifications setting
      */
-    public Client(String id, String name, String taxId) {
-        _id = id;
+    public Client(String key, String name, String taxId) {
+        _key = key;
         _name = name;
         _taxId = taxId;
-/*         _level = new NormalLevelClient(); */
+        /* _level = new NormalLevelClient(); */
         _payments = 0;
         _debts = 0;
         _notifiable = true;
     }
 
     /**
-     * @return the client's id
+     * @return the client's key
      */
-    public String getId() {
-        return _id;
+    public String getKey() {
+        return _key;
     }
 
     /**
@@ -90,8 +90,10 @@ public class Client implements Serializable {
         return _notifiable;
     }
 
-/*     public abstract class Level implements Serializable {
-        // FIXME define serial number
-
-    } */
+    /*
+     * public abstract class Level implements Serializable {
+     * // FIXME define serial number
+     * 
+     * }
+     */
 }
