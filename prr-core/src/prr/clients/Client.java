@@ -1,6 +1,10 @@
 package prr.clients;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.TreeMap;
+
+import prr.terminals.Terminal;
 
 public class Client implements Serializable {
 
@@ -28,6 +32,9 @@ public class Client implements Serializable {
     /** Client level */
     private Level _level;
 
+    /** Client terminals */
+    private Map<String, Terminal> _terminals;
+
     /**
      * Constructor.
      * 
@@ -46,6 +53,7 @@ public class Client implements Serializable {
         _payments = 0;
         _debts = 0;
         _notifiable = true;
+        _terminals = new TreeMap<>();
     }
 
     /**
@@ -98,7 +106,8 @@ public class Client implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("CLIENT|%s|%s|%s|%s|%s|%s|%S", _key, _name, _taxId,
-                _level.getName() , _notifiable ? "YES" : "NO", Math.round(_payments), Math.round(_debts));
+        return String.format("CLIENT|%s|%s|%s|%s|%s|%d|%d|%d", _key, _name, _taxId,
+                _level.getName(), _notifiable ? "YES" : "NO", _terminals.size(), Math.round(_payments),
+                Math.round(_debts));
     }
 }

@@ -12,9 +12,14 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /** Serial number for serialization. */
         private static final long serialVersionUID = 202208091753L;
 
-        // FIXME define attributes
-        // FIXME define contructor(s)
-        // FIXME define methods
+        /** The terminal's key. */
+        private String _key;
+
+        /** Total payments made by this terminal. */
+        private float _payments;
+
+        /** Total debts of this terminal. */
+        private float _debts;
 
         /**
          * Checks if this terminal can end the current interactive communication.
