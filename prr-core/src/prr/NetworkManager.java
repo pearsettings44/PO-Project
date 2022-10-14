@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import prr.exceptions.IllegalEntryException;
 import prr.exceptions.ImportFileException;
 import prr.exceptions.MissingFileAssociationException;
 import prr.exceptions.UnavailableFileException;
@@ -74,7 +75,6 @@ public class NetworkManager {
 	public void load(String filename) throws UnavailableFileException {
 		try (ObjectInputStream in = new ObjectInputStream(
 				new BufferedInputStream(new FileInputStream(filename)))) {
-			System.out.println("Loading from file '" + getFilename() + "'...");
 			setNetwork((Network) in.readObject());
 			setFilename(filename);
 		} catch (IOException | ClassNotFoundException e) {
@@ -135,7 +135,7 @@ public class NetworkManager {
 	public void importFile(String filename) throws ImportFileException {
 		try {
 			_network.importFile(filename);
-		} catch (IOException | UnrecognizedEntryException /* FIXME maybe other exceptions */ e) {
+		} catch (IOException | UnrecognizedEntryException | IllegalEntryException e) {
 			throw new ImportFileException(filename, e);
 		}
 	}
