@@ -32,6 +32,35 @@ public class Network implements Serializable {
 	/* Terminals */
 	private Map<String, Terminal> _terminals = new TreeMap<>();
 
+	/**
+	 * Network's dirty state, which represents if the network was modified since
+	 * the last time it was saved/created.
+	 */
+	private boolean dirty = false;
+
+	/**
+	 * Get the network's dirty state.
+	 * 
+	 * @return the network's dirty state
+	 */
+	public boolean isDirty() {
+		return this.dirty;
+	}
+
+	/**
+	 * Set the dirty flag to false, representing that the network has been saved
+	 */
+	public void clean() {
+		this.dirty = false;
+	}
+
+	/**
+	 * Set the dirty flag to true, representing that the network has been modified
+	 */
+	private void dirty() {
+		this.dirty = true;
+	}
+
 	// FIXME define attributes
 	// FIXME define contructor(s)
 	// FIXME define methods
@@ -62,6 +91,7 @@ public class Network implements Serializable {
 		}
 		Client client = new Client(key, name, taxID);
 		this._clients.put(key, client);
+		this.dirty();
 	}
 
 	/**
@@ -76,7 +106,10 @@ public class Network implements Serializable {
 	 * Disable client notifications.
 	 * 
 	 * @param key client key
-	 * @throws UnknownClientKeyException if client key does not exist
+	 * @throws UnknownClientKeyException                   if client key does not
+	 *                                                     exist
+	 * @throws ClientNotificationsAlreadyDisabledException if client notifications
+	 *                                                     are already disabled
 	 */
 	public void disableClientNotifications(String key) throws UnknownClientKeyException,
 			ClientNotificationsAlreadyDisabledException {
@@ -95,7 +128,11 @@ public class Network implements Serializable {
 	 * Enable client notifications.
 	 * 
 	 * @param key client key
-	 * @throws UnknownClientKeyException if client key does not exist
+	 * @throws UnknownClientKeyException                  if client key does not
+	 *                                                    exist
+	 * @throws ClientNotificationsAlreadyEnabledException if client notifications
+	 *                                                    are already enabled
+	 * 
 	 */
 	public void enableClientNotifications(String key)
 			throws UnknownClientKeyException, ClientNotificationsAlreadyEnabledException {

@@ -1,7 +1,13 @@
 package prr;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import prr.exceptions.ImportFileException;
 import prr.exceptions.MissingFileAssociationException;
@@ -17,21 +23,42 @@ public class NetworkManager {
 
 	/** The network itself. */
 	private Network _network = new Network();
-	
+
+	/** The name of the file associated with the network. */
 	private String _filename = "";
 
+	/**
+	 * Get the network.
+	 *
+	 * @return the network
+	 */
 	public Network getNetwork() {
 		return _network;
 	}
 
+	/**
+	 * Get the name of the file associated with the network.
+	 *
+	 * @return the name of the file associated with the network
+	 */
 	public String getFilename() {
 		return _filename;
 	}
 
+	/**
+	 * Set the name of the file associated with the network.
+	 *
+	 * @param filename the name of the file associated with the network
+	 */
 	public void setFilename(String filename) {
 		_filename = filename;
 	}
 
+	/**
+	 * Set the network.
+	 * 
+	 * @param network the network to be set
+	 */
 	public void setNetwork(Network network) {
 		_network = network;
 	}
@@ -45,7 +72,14 @@ public class NetworkManager {
 	 *                                  an error while processing this file.
 	 */
 	public void load(String filename) throws UnavailableFileException {
-		// FIXME implement serialization method
+		try (ObjectInputStream in = new ObjectInputStream(
+				new BufferedInputStream(new FileInputStream(filename)))) {
+			System.out.println("Loading from file '" + getFilename() + "'...");
+			setNetwork((Network) in.readObject());
+			setFilename(filename);
+		} catch (IOException | ClassNotFoundException e) {
+			throw new UnavailableFileException(getFilename());
+		}
 	}
 
 	/**
@@ -61,7 +95,16 @@ public class NetworkManager {
 	 *                                         to disk.
 	 */
 	public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-		// FIXME implement serialization method
+		if (getFilename() == null || this.getFilename().isBlank()) {
+			throw new MissingFileAssociationException();
+		}
+		if (getNetwork().isDirty()) {
+			try (ObjectOutputStream out = new ObjectOutputStream(
+					new BufferedOutputStream(new FileOutputStream(_filename)))) {
+				out.writeObject(getNetwork());
+			}
+			getNetwork().clean();
+		}
 	}
 
 	/**
@@ -79,7 +122,8 @@ public class NetworkManager {
 	 *                                         to disk.
 	 */
 	public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
-		// FIXME implement serialization method
+		setFilename(filename);
+		save();
 	}
 
 	/**
