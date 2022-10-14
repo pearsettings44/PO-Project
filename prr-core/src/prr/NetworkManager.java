@@ -17,10 +17,23 @@ public class NetworkManager {
 
 	/** The network itself. */
 	private Network _network = new Network();
-	// FIXME addmore fields if needed
+	
+	private String _filename = "";
 
 	public Network getNetwork() {
 		return _network;
+	}
+
+	public String getFilename() {
+		return _filename;
+	}
+
+	public void setFilename(String filename) {
+		_filename = filename;
+	}
+
+	public void setNetwork(Network network) {
+		_network = network;
 	}
 
 	/**
