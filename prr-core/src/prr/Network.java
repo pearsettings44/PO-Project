@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.io.IOException;
 
 import prr.clients.Client;
+import prr.exceptions.ClientNotificationsAlreadyEnabledException;
+import prr.exceptions.ClientNotificationsAlreadyDisabledException;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 import prr.exceptions.UnknownClientKeyException;
@@ -76,13 +78,14 @@ public class Network implements Serializable {
 	 * @param key client key
 	 * @throws UnknownClientKeyException if client key does not exist
 	 */
-	public void disableClientNotifications(String key) throws UnknownClientKeyException {
+	public void disableClientNotifications(String key) throws UnknownClientKeyException,
+			ClientNotificationsAlreadyDisabledException {
 		Client client = _clients.get(key);
 		if (client != null) {
 			if (client.getNotifiable() == true)
 				client.disableNotifiable();
 			else
-				System.out.println("Client notifications are already disabled.");
+				throw new ClientNotificationsAlreadyDisabledException();
 		} else {
 			throw new UnknownClientKeyException(key);
 		}
@@ -94,13 +97,14 @@ public class Network implements Serializable {
 	 * @param key client key
 	 * @throws UnknownClientKeyException if client key does not exist
 	 */
-	public void enableClientNotifications(String key) throws UnknownClientKeyException {
+	public void enableClientNotifications(String key)
+			throws UnknownClientKeyException, ClientNotificationsAlreadyEnabledException {
 		Client client = _clients.get(key);
 		if (client != null) {
 			if (client.getNotifiable() == false)
 				client.enableNotifiable();
 			else
-				System.out.println("Client already has notifications enabled");
+				throw new ClientNotificationsAlreadyEnabledException();
 		} else {
 			throw new UnknownClientKeyException(key);
 		}
