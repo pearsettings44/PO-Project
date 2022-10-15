@@ -9,7 +9,9 @@ import prr.clients.Client;
 import prr.exceptions.ClientNotificationsAlreadyEnabledException;
 import prr.exceptions.ClientNotificationsAlreadyDisabledException;
 import prr.exceptions.DuplicateClientKeyException;
+import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.IllegalEntryException;
+import prr.exceptions.InvalidTerminalKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 import prr.exceptions.UnknownClientKeyException;
 
@@ -18,6 +20,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import prr.terminals.Terminal;
+import prr.terminals.BasicTerminal;
+import prr.terminals.FancyTerminal;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -64,14 +68,10 @@ public class Network implements Serializable {
 		this.dirty = true;
 	}
 
-	// FIXME define attributes
-	// FIXME define contructor(s)
-	// FIXME define methods
-
 	/**
 	 * Parse and import a client entry from a plain text file.
 	 * A correct client entry has the following format:
-	 * {@code CLIENT|id|name|taxID}
+	 * {@code CLIENT|key|name|taxID}
 	 *
 	 * @param fields The fields of the client to import
 	 * @throws IllegalEntryException if the entry contains an illegal field
@@ -80,6 +80,23 @@ public class Network implements Serializable {
 		try {
 			this.registerClient(fields[1], fields[2], fields[3]);
 		} catch (DuplicateClientKeyException e) {
+			throw new IllegalEntryException(fields);
+		}
+	}
+
+	/**
+	 * Parse and import a basic terminal entry from a plain text file.
+	 * A correct basic terminal entry has the following format:
+	 * {@code BASIC|key|ClientKey|State}
+	 *
+	 * @param fields The fields of the client to import
+	 * @throws IllegalEntryException if the entry contains an illegal field
+	 */
+	private void importTerminal(String[] fields) throws IllegalEntryException {
+		try {
+			this.registerTerminal(fields[1], fields[0], fields[2], fields[3]);
+		} catch (DuplicateTerminalKeyException | InvalidTerminalKeyException
+				| UnknownClientKeyException e) {
 			throw new IllegalEntryException(fields);
 		}
 	}
@@ -96,9 +113,9 @@ public class Network implements Serializable {
 			throws UnrecognizedEntryException, IllegalEntryException {
 		switch (fields[0]) {
 			case "CLIENT" -> this.importClient(fields);
+			case "BASIC" -> this.importTerminal(fields);
+			case "FANCY" -> this.importTerminal(fields);
 			/*
-			 * case "BASIC" -> this.importTerminal(fields);
-			 * case "FANCY" -> this.importTerminal(fields);
 			 * case "FRIENDS" -> this.FIX_ME(fields);
 			 */
 			default -> throw new UnrecognizedEntryException(String.join("|", fields));
@@ -140,11 +157,65 @@ public class Network implements Serializable {
 	}
 
 	/**
+	 * Register new terminal.
+	 * 
+	 * @param key       terminal key
+	 * @param type      terminal type
+	 * @param clientKey client key
+	 * @throws DuplicateClientKeyException if client key already exists
+	 */
+	public void registerTerminal(String key, String type, String clientKey)
+			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
+		if (_terminals.containsKey(key)) {
+			throw new DuplicateTerminalKeyException(key);
+		}
+		if (type.equals("BASIC")) {
+			Terminal terminal = new BasicTerminal(key, clientKey);
+			this._terminals.put(key, terminal);
+		} else {
+			Terminal terminal = new FancyTerminal(key, clientKey);
+			this._terminals.put(key, terminal);
+		}
+		this.dirty();
+	}
+
+	/**
+	 * Register new terminal.
+	 * 
+	 * @param key       terminal key
+	 * @param type      terminal type
+	 * @param clientKey client key
+	 * @throws DuplicateClientKeyException if client key already exists
+	 */
+	public void registerTerminal(String key, String type, String clientKey, String state)
+			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
+		if (_terminals.containsKey(key)) {
+			throw new DuplicateTerminalKeyException(key);
+		}
+		if (type.equals("BASIC")) {
+			Terminal terminal = new BasicTerminal(key, clientKey, state);
+			this._terminals.put(key, terminal);
+		} else {
+			Terminal terminal = new FancyTerminal(key, clientKey, state);
+			this._terminals.put(key, terminal);
+		}
+		this.dirty();
+	}
+
+	/**
 	 * 
 	 * @return all clients
 	 */
 	public Collection<Client> clients() {
 		return _clients.values();
+	}
+
+	/**
+	 * 
+	 * @return all terminals
+	 */
+	public Collection<Terminal> terminals() {
+		return _terminals.values();
 	}
 
 	/**
@@ -160,10 +231,12 @@ public class Network implements Serializable {
 			ClientNotificationsAlreadyDisabledException {
 		Client client = _clients.get(key);
 		if (client != null) {
-			if (client.getNotifiable() == true)
+			if (client.getNotifiable() == true) {
 				client.disableNotifiable();
-			else
+				this.dirty();
+			} else {
 				throw new ClientNotificationsAlreadyDisabledException();
+			}
 		} else {
 			throw new UnknownClientKeyException(key);
 		}
@@ -183,10 +256,12 @@ public class Network implements Serializable {
 			throws UnknownClientKeyException, ClientNotificationsAlreadyEnabledException {
 		Client client = _clients.get(key);
 		if (client != null) {
-			if (client.getNotifiable() == false)
+			if (client.getNotifiable() == false) {
 				client.enableNotifiable();
-			else
+				this.dirty();
+			} else {
 				throw new ClientNotificationsAlreadyEnabledException();
+			}
 		} else {
 			throw new UnknownClientKeyException(key);
 		}

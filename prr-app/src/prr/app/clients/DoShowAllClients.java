@@ -1,5 +1,7 @@
 package prr.app.clients;
 
+import java.util.Collections;
+
 import prr.Network;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
