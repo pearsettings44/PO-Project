@@ -112,6 +112,27 @@ public class Client implements Serializable {
         _notifiable = true;
     }
 
+    /**
+     * @return the client's number of terminals
+     */
+    public int numberOfTerminals() {
+        return _terminals.size();
+    }
+
+    /**
+     * Adds a terminal to the client's terminals
+     */
+    public void addTerminal(Terminal terminal) {
+        _terminals.put(terminal.getKey(), terminal);
+    }
+
+    /**
+     * Gets a terminal from the client's terminals
+     */
+    public Terminal getTerminal(String key) {
+        return _terminals.get(key);
+    }
+
     public abstract class Level implements Serializable {
         private static final long serialVersionUID = 202210121157L;
 
@@ -121,7 +142,8 @@ public class Client implements Serializable {
     @Override
     public String toString() {
         return String.format("CLIENT|%s|%s|%s|%s|%s|%d|%d|%d", _key, _name, _taxId,
-                _level.getName(), _notifiable ? "YES" : "NO", _terminals.size(), Math.round(_payments),
+                _level.getName(), _notifiable ? "YES" : "NO",
+                numberOfTerminals(), Math.round(_payments),
                 Math.round(_debts));
     }
 }

@@ -168,15 +168,18 @@ public class Network implements Serializable {
 			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
 		if (_terminals.containsKey(key)) {
 			throw new DuplicateTerminalKeyException(key);
-		}
-		if (type.equals("BASIC")) {
-			Terminal terminal = new BasicTerminal(key, clientKey);
-			this._terminals.put(key, terminal);
 		} else {
-			Terminal terminal = new FancyTerminal(key, clientKey);
-			this._terminals.put(key, terminal);
+			if (type.equals("BASIC")) {
+				Terminal terminal = new BasicTerminal(key, clientKey);
+				this._terminals.put(key, terminal);
+				_clients.get(clientKey).addTerminal(terminal);
+			} else {
+				Terminal terminal = new FancyTerminal(key, clientKey);
+				this._terminals.put(key, terminal);
+				_clients.get(clientKey).addTerminal(terminal);
+			}
+			this.dirty();
 		}
-		this.dirty();
 	}
 
 	/**
@@ -191,15 +194,18 @@ public class Network implements Serializable {
 			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
 		if (_terminals.containsKey(key)) {
 			throw new DuplicateTerminalKeyException(key);
-		}
-		if (type.equals("BASIC")) {
-			Terminal terminal = new BasicTerminal(key, clientKey, state);
-			this._terminals.put(key, terminal);
 		} else {
-			Terminal terminal = new FancyTerminal(key, clientKey, state);
-			this._terminals.put(key, terminal);
+			if (type.equals("BASIC")) {
+				Terminal terminal = new BasicTerminal(key, clientKey, state);
+				this._terminals.put(key, terminal);
+				_clients.get(clientKey).addTerminal(terminal);
+			} else {
+				Terminal terminal = new FancyTerminal(key, clientKey, state);
+				this._terminals.put(key, terminal);
+				_clients.get(clientKey).addTerminal(terminal);
+			}
+			this.dirty();
 		}
-		this.dirty();
 	}
 
 	/**
