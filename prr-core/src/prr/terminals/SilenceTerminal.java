@@ -9,6 +9,6 @@ public class SilenceTerminal extends Terminal.State {
 
     @Override
     public String getState() {
-        return "Silence";
+        return "SILENCE";
     }
 }

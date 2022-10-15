@@ -41,6 +41,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 _client = client;
                 _payments = 0;
                 _debts = 0;
+                _state = new IdleTerminal(this);
 
         }
 
@@ -57,7 +58,21 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 _client = client;
                 _payments = 0;
                 _debts = 0;
-                _state = state;
+                switch (state) {
+                        case "IDLE":
+                                _state = new IdleTerminal(this);
+                                break;
+                        case "BUSY":
+
+                                _state = new BusyTerminal(this);
+                                break;
+                        case "SILENCE":
+                                _state = new SilenceTerminal(this);
+                                break;
+                        case "OFF":
+                                _state = new OffTerminal(this);
+                                break;
+                }
 
         }
 
@@ -79,7 +94,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return the terminal's state
          */
         public String getState() {
-                return _state;
+                return _state.getState();
         }
 
         /**
@@ -101,7 +116,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
                 public abstract String getState();
         }
-        
+
         /**
          * Checks if this terminal can end the current interactive communication.
          *
