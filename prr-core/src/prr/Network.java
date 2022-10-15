@@ -77,6 +77,14 @@ public class Network implements Serializable {
 		}
 	}
 
+	public Client getClient(String key) throws UnknownClientKeyException {
+		if (!_clients.containsKey(key)) {
+			throw new UnknownClientKeyException(key);
+		} else {
+			return _clients.get(key);
+		}
+	}
+
 	/**
 	 * @return all clients
 	 */
