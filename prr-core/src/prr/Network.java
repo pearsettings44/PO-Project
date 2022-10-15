@@ -14,6 +14,7 @@ import prr.exceptions.IllegalEntryException;
 import prr.exceptions.InvalidTerminalKeyException;
 import prr.exceptions.UnrecognizedEntryException;
 import prr.exceptions.UnknownClientKeyException;
+import prr.exceptions.UnknownTerminalKeyException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -66,6 +67,14 @@ public class Network implements Serializable {
 	 */
 	private void dirty() {
 		this.dirty = true;
+	}
+
+	public Terminal getTerminal(String key) throws UnknownTerminalKeyException {
+		if (!_terminals.containsKey(key)) {
+			throw new UnknownTerminalKeyException(key);
+		} else {
+			return _terminals.get(key);
+		}
 	}
 
 	/**
