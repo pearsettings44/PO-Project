@@ -78,7 +78,7 @@ public class NetworkManager {
 			setNetwork((Network) in.readObject());
 			setFilename(filename);
 		} catch (IOException | ClassNotFoundException e) {
-			throw new UnavailableFileException(getFilename());
+			throw new UnavailableFileException(filename);
 		}
 	}
 
