@@ -5,7 +5,6 @@ import prr.app.exceptions.UnknownTerminalKeyException;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import prr.exceptions.UnrecognizedEntryException;
-//FIXME add mode import if needed
 
 /**
  * Open a specific terminal's menu.
@@ -19,9 +18,6 @@ class DoOpenMenuTerminalConsole extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-		// FIXME implement command
-		// create an instance of prr.app.terminal.Menu with the
-		// selected Terminal
 		String key = stringField("key");
 		try {
 			(new prr.app.terminal.Menu(_receiver, _receiver.getTerminal(key))).open();

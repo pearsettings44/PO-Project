@@ -6,8 +6,6 @@ import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import prr.exceptions.ClientNotificationsAlreadyDisabledException;
 
-//FIXME add more imports if needed
-
 /**
  * Disable client notifications.
  */
