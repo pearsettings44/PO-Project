@@ -199,7 +199,11 @@ public class Network implements Serializable {
 			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
 		if (_terminals.containsKey(key)) {
 			throw new DuplicateTerminalKeyException(key);
-		} else {
+		
+		} else if (!_clients.containsKey(clientKey)) {
+			throw new UnknownClientKeyException(clientKey);
+		}
+		 else {
 			if (type.equals("BASIC")) {
 				Terminal terminal = new BasicTerminal(key, clientKey);
 				this._terminals.put(key, terminal);

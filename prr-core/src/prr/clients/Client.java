@@ -48,7 +48,8 @@ public class Client implements Serializable {
     public Client(String key, String name, String taxId) {
         _key = key;
         _name = name;
-        _taxId = taxId;
+        // Remove starting zeros from the tax id
+        _taxId = String.valueOf(Integer.parseInt(taxId));
         _level = new NormalLevelClient(this);
         _payments = 0;
         _debts = 0;

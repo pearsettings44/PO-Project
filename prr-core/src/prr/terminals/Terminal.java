@@ -59,7 +59,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 _payments = 0;
                 _debts = 0;
                 switch (state) {
-                        case "IDLE":
+                        case "ON":
                                 _state = new IdleTerminal(this);
                                 break;
                         case "BUSY":

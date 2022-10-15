@@ -9,7 +9,7 @@ public class BasicTerminal extends Terminal {
     }
 
     public BasicTerminal(String key, String clientKey, String state) {
-        super(key, clientKey);
+        super(key, clientKey, state);
         _type = "BASIC";
     }
 
