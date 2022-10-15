@@ -12,7 +12,7 @@ class DoShowClient extends Command<Network> {
 
 	DoShowClient(Network receiver) {
 		super(Label.SHOW_CLIENT, receiver);
-		//FIXME add command fields
+		addStringField("key", Prompt.key());
 	}
 
 	@Override

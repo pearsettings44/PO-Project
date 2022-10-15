@@ -78,6 +78,20 @@ public class Network implements Serializable {
 	}
 
 	/**
+	 * @return all clients
+	 */
+	public Collection<Client> clients() {
+		return _clients.values();
+	}
+
+	/**
+	 * @return all terminals
+	 */
+	public Collection<Terminal> terminals() {
+		return _terminals.values();
+	}
+
+	/**
 	 * Parse and import a client entry from a plain text file.
 	 * A correct client entry has the following format:
 	 * {@code CLIENT|key|name|taxID}
@@ -215,22 +229,6 @@ public class Network implements Serializable {
 			}
 			this.dirty();
 		}
-	}
-
-	/**
-	 * 
-	 * @return all clients
-	 */
-	public Collection<Client> clients() {
-		return _clients.values();
-	}
-
-	/**
-	 * 
-	 * @return all terminals
-	 */
-	public Collection<Terminal> terminals() {
-		return _terminals.values();
 	}
 
 	/**
