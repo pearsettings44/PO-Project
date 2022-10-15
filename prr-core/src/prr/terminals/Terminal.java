@@ -27,7 +27,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private String _client;
 
         /** The terminal's state */
-        private String _state = "IDLE";
+        private State _state;
 
         /**
          * Constructor.
@@ -94,6 +94,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          */
         public float getDebts() {
                 return _debts;
+        }
+
+        public abstract class State implements Serializable {
+                private static final long serialVersionUID = 202210151200L;
+
+                public abstract String getState();
         }
         
         /**
