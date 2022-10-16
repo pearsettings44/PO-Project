@@ -132,6 +132,18 @@ public class Network implements Serializable {
 		}
 	}
 
+	private void importFriends(String[] fields) throws IllegalEntryException {
+		String[] friendskeys = fields[2].split(",");
+		try {
+			Terminal terminal = getTerminal(fields[1]);
+			for (String friendkey : friendskeys) {
+				terminal.insertFriend(friendkey, getTerminal(friendkey));
+			}
+		} catch (UnknownTerminalKeyException e) {
+			throw new IllegalEntryException(fields);
+		}
+	}
+
 	/**
 	 * Parse and import an entry (line) from a plain text file.
 	 *
@@ -146,9 +158,7 @@ public class Network implements Serializable {
 			case "CLIENT" -> this.importClient(fields);
 			case "BASIC" -> this.importTerminal(fields);
 			case "FANCY" -> this.importTerminal(fields);
-			/*
-			 * case "FRIENDS" -> this.FIX_ME(fields);
-			 */
+			case "FRIENDS" -> this.importFriends(fields);
 			default -> throw new UnrecognizedEntryException(String.join("|", fields));
 		}
 	}
@@ -197,28 +207,26 @@ public class Network implements Serializable {
 	 */
 	public void registerTerminal(String key, String type, String clientKey)
 			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
-		if (_terminals.containsKey(key)) {
+		if (_terminals.containsKey(key))
 			throw new DuplicateTerminalKeyException(key);
-		
-		} else if (!_clients.containsKey(clientKey)) {
+		if (!_clients.containsKey(clientKey))
 			throw new UnknownClientKeyException(clientKey);
+		if (key.length() != 6)
+			throw new InvalidTerminalKeyException(key);
+		if (type.equals("BASIC")) {
+			Terminal terminal = new BasicTerminal(key, clientKey);
+			this._terminals.put(key, terminal);
+			_clients.get(clientKey).addTerminal(terminal);
+		} else {
+			Terminal terminal = new FancyTerminal(key, clientKey);
+			this._terminals.put(key, terminal);
+			_clients.get(clientKey).addTerminal(terminal);
 		}
-		 else {
-			if (type.equals("BASIC")) {
-				Terminal terminal = new BasicTerminal(key, clientKey);
-				this._terminals.put(key, terminal);
-				_clients.get(clientKey).addTerminal(terminal);
-			} else {
-				Terminal terminal = new FancyTerminal(key, clientKey);
-				this._terminals.put(key, terminal);
-				_clients.get(clientKey).addTerminal(terminal);
-			}
-			this.dirty();
-		}
+		this.dirty();
 	}
 
 	/**
-	 * Register new terminal.
+	 * Register new terminal from an import file (contains the state).
 	 * 
 	 * @param key       terminal key
 	 * @param type      terminal type
@@ -227,20 +235,22 @@ public class Network implements Serializable {
 	 */
 	public void registerTerminal(String key, String type, String clientKey, String state)
 			throws DuplicateTerminalKeyException, InvalidTerminalKeyException, UnknownClientKeyException {
-		if (_terminals.containsKey(key)) {
+		if (_terminals.containsKey(key))
 			throw new DuplicateTerminalKeyException(key);
+		if (!_clients.containsKey(clientKey))
+			throw new UnknownClientKeyException(clientKey);
+		if (key.length() != 6)
+			throw new InvalidTerminalKeyException(key);
+		if (type.equals("BASIC")) {
+			Terminal terminal = new BasicTerminal(key, clientKey, state);
+			this._terminals.put(key, terminal);
+			_clients.get(clientKey).addTerminal(terminal);
 		} else {
-			if (type.equals("BASIC")) {
-				Terminal terminal = new BasicTerminal(key, clientKey, state);
-				this._terminals.put(key, terminal);
-				_clients.get(clientKey).addTerminal(terminal);
-			} else {
-				Terminal terminal = new FancyTerminal(key, clientKey, state);
-				this._terminals.put(key, terminal);
-				_clients.get(clientKey).addTerminal(terminal);
-			}
-			this.dirty();
+			Terminal terminal = new FancyTerminal(key, clientKey, state);
+			this._terminals.put(key, terminal);
+			_clients.get(clientKey).addTerminal(terminal);
 		}
+		this.dirty();
 	}
 
 	/**
@@ -291,4 +301,16 @@ public class Network implements Serializable {
 			throw new UnknownClientKeyException(key);
 		}
 	}
+
+	/**
+	 * Adds a certain terminal to the terminal friend list
+	 * 
+	 * @param terminal Terminal to accept a new friend
+	 * @param key      Key of the new friend
+	 * @throws UnknownTerminalKeyException if the terminal key does not exist
+	 */
+	public void addFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
+		terminal.insertFriend(key, getTerminal(key));
+	}
+
 }

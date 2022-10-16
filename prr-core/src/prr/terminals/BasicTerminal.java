@@ -22,9 +22,9 @@ public class BasicTerminal extends Terminal {
 
     @Override
     public String toString() {
-        return String.format("%s|%s|%s|%s|%d|%d", getType(), getKey(), getClient(),
+        return String.format("%s|%s|%s|%s|%d|%d%s", getType(), getKey(), getClient(),
                 getState(), Math.round(getPayments()),
-                Math.round(getDebts()));
+                Math.round(getDebts()), hasFriends() ? "|" + friendsToString() : "");
     }
 
 }

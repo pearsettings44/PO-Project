@@ -1,6 +1,8 @@
 package prr.terminals;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.TreeMap;
 
 import prr.clients.Client;
 
@@ -28,6 +30,9 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
 
         /** The terminal's state */
         private State _state;
+
+        /** The terminal's friends */
+        private Map<String, Terminal> _friends = new TreeMap<>();
 
         /**
          * Constructor.
@@ -108,6 +113,47 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          */
         public float getDebts() {
                 return _debts;
+        }
+
+        /**
+         * @return true if the terminal has any friends, false otherwise
+         */
+        public boolean hasFriends() {
+                return !_friends.isEmpty();
+        }
+
+        /**
+         * @return the terminal's friends
+         */
+        public Map<String, Terminal> getFriends() {
+                return _friends;
+        }
+
+        public String friendsToString() {
+                String friends = "";
+                for (Terminal terminal : _friends.values()) {
+                        friends += terminal.getKey() + ",";
+                }
+                return friends.substring(0, friends.length() - 1);
+        }
+
+        /**
+         * Adds a friend to the terminal's friend list
+         * 
+         * @param friend
+         */
+        public void insertFriend(String friendKey, Terminal friend) {
+                _friends.putIfAbsent(friendKey, friend);
+        }
+
+        /**
+         * Gets a friend from the terminal's friend list
+         * 
+         * @param friendKey
+         * @return the friend
+         */
+        public Terminal getFriend(String friendKey) {
+                return _friends.get(friendKey);
         }
 
         public abstract class State implements Serializable {
