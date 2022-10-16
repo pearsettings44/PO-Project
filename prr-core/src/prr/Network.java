@@ -132,6 +132,14 @@ public class Network implements Serializable {
 		}
 	}
 
+	/**
+	 * Parse and import a friend terminal entry from a plain text file.
+	 * A correct friend terminal entry has the following format:
+	 * {@code FRIEND|TerminalKey|<FriendKey1>,<FriendKey2>,...}
+	 * 
+	 * @param fields The fields of the friends to import
+	 * @throws IllegalEntryException if the entry contains an illegal field
+	 */
 	private void importFriends(String[] fields) throws IllegalEntryException {
 		String[] friendskeys = fields[2].split(",");
 		try {
