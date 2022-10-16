@@ -182,9 +182,8 @@ public class Network implements Serializable {
 	void importFile(String filename) throws UnrecognizedEntryException, IOException, IllegalEntryException {
 		try (BufferedReader s = new BufferedReader(new FileReader(filename))) {
 			String line;
-			while ((line = s.readLine()) != null) {
+			while ((line = s.readLine()) != null)
 				importFromFields(line.split("\\|"));
-			}
 		}
 	}
 
@@ -197,9 +196,8 @@ public class Network implements Serializable {
 	 * @throws DuplicateClientKeyException if client key already exists
 	 */
 	public void registerClient(String key, String name, int taxID) throws DuplicateClientKeyException {
-		if (_clients.containsKey(key)) {
+		if (_clients.containsKey(key))
 			throw new DuplicateClientKeyException(key);
-		}
 		Client client = new Client(key, name, taxID);
 		this._clients.put(key, client);
 		this.dirty();
@@ -277,12 +275,10 @@ public class Network implements Serializable {
 			if (client.getNotifiable() == true) {
 				client.disableNotifiable();
 				this.dirty();
-			} else {
+			} else
 				throw new ClientNotificationsAlreadyDisabledException();
-			}
-		} else {
+		} else
 			throw new UnknownClientKeyException(key);
-		}
 	}
 
 	/**
@@ -302,12 +298,10 @@ public class Network implements Serializable {
 			if (client.getNotifiable() == false) {
 				client.enableNotifiable();
 				this.dirty();
-			} else {
+			} else
 				throw new ClientNotificationsAlreadyEnabledException();
-			}
-		} else {
+		} else
 			throw new UnknownClientKeyException(key);
-		}
 	}
 
 	/**
@@ -331,6 +325,5 @@ public class Network implements Serializable {
 	public void removeFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
 		terminal.deleteFriend(key);
 	}
-	
 
 }
