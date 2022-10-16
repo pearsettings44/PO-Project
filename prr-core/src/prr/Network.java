@@ -109,7 +109,7 @@ public class Network implements Serializable {
 	 */
 	private void importClient(String[] fields) throws IllegalEntryException {
 		try {
-			this.registerClient(fields[1], fields[2], fields[3]);
+			this.registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
 		} catch (DuplicateClientKeyException e) {
 			throw new IllegalEntryException(fields);
 		}
@@ -178,7 +178,7 @@ public class Network implements Serializable {
 	 * @param taxId client tax id
 	 * @throws DuplicateClientKeyException if client key already exists
 	 */
-	public void registerClient(String key, String name, String taxID) throws DuplicateClientKeyException {
+	public void registerClient(String key, String name, int taxID) throws DuplicateClientKeyException {
 		if (_clients.containsKey(key)) {
 			throw new DuplicateClientKeyException(key);
 		}

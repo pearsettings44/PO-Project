@@ -18,7 +18,7 @@ public class Client implements Serializable {
     private String _name;
 
     /** The client's tax id number. */
-    private String _taxId;
+    private int _taxId;
 
     /** Total payments made by this client. */
     private float _payments;
@@ -45,11 +45,10 @@ public class Client implements Serializable {
      * @param debts      total debts of this client
      * @param notifiable notifications setting
      */
-    public Client(String key, String name, String taxId) {
+    public Client(String key, String name, int taxId) {
         _key = key;
         _name = name;
-        // Remove starting zeros from the tax id
-        _taxId = String.valueOf(Integer.parseInt(taxId));
+        _taxId = taxId;
         _level = new NormalLevelClient(this);
         _payments = 0;
         _debts = 0;
@@ -74,7 +73,7 @@ public class Client implements Serializable {
     /**
      * @return the client's tax id number
      */
-    public String getTaxId() {
+    public int getTaxId() {
         return _taxId;
     }
 
@@ -142,7 +141,7 @@ public class Client implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("CLIENT|%s|%s|%s|%s|%s|%d|%d|%d", _key, _name, _taxId,
+        return String.format("CLIENT|%s|%s|%d|%s|%s|%d|%d|%d", _key, _name, _taxId,
                 _level.getName(), _notifiable ? "YES" : "NO",
                 numberOfTerminals(), Math.round(_payments),
                 Math.round(_debts));
