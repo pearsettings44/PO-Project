@@ -1,21 +1,28 @@
 package prr.terminals;
 
 public class FancyTerminal extends Terminal {
-    private String _type;
+    private String _type = "FANCY";
 
     public FancyTerminal(String key, String clientKey) {
         super(key, clientKey);
-        _type = "FANCY";
     }
 
     public FancyTerminal(String key, String clientKey, String state) {
         super(key, clientKey, state);
-        _type = "FANCY";
+    }
+
+    /**
+     * Get the terminal's type
+     * 
+     * @return the terminal's type
+     */
+    public String getType() {
+        return _type;
     }
 
     @Override
     public String toString() {
-        return String.format("FANCY|%s|%s|%s|%d|%d", getKey(), getClient(),
+        return String.format("%s|%s|%s|%s|%d|%d", getType(), getKey(), getClient(),
                 getState(), Math.round(getPayments()),
                 Math.round(getDebts()));
     }
