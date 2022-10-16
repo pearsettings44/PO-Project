@@ -321,4 +321,16 @@ public class Network implements Serializable {
 		terminal.insertFriend(key, getTerminal(key));
 	}
 
+	/**
+	 * Removes a certain terminal from the terminal friend list
+	 * 
+	 * @param terminal Terminal to remove a friend
+	 * @param key      Key of the friend to remove
+	 * @throws UnknownTerminalKeyException if the terminal key does not exist
+	 */
+	public void removeFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
+		terminal.deleteFriend(key);
+	}
+	
+
 }

@@ -129,6 +129,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 return _friends;
         }
 
+        /**
+         * Gets the terminal's friend's keys formatted as a string.
+         * 
+         * @return the terminal's friend's keys formatted as a string
+         */
         public String friendsToString() {
                 String friends = "";
                 for (Terminal terminal : _friends.values()) {
@@ -144,6 +149,15 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          */
         public void insertFriend(String friendKey, Terminal friend) {
                 _friends.putIfAbsent(friendKey, friend);
+        }
+
+        /**
+         * Deletes a friend from the terminal's friend list
+         * 
+         * @param friend
+         */
+        public void deleteFriend(String friendKey) {
+                _friends.remove(friendKey);
         }
 
         /**
