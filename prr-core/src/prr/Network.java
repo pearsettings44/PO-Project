@@ -18,6 +18,8 @@ import prr.exceptions.UnknownTerminalKeyException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -340,6 +342,26 @@ public class Network implements Serializable {
 			if (client.getDebts() == 0)
 				clients.add(client);
 		}
+		return clients;
+	}
+
+	/**
+	 * Gets all the Clients with debts, ordered.
+	 * 
+	 * @return all the clients with debts
+	 */
+	public List<Client> getClientsWithDebt() {
+		List<Client> clients = new ArrayList<Client>();
+		for (Client client : _clients.values()) {
+			if (client.getDebts() > 0)
+				clients.add(client);
+		}
+		Collections.sort(clients, new Comparator<Client>() {
+			@Override
+			public int compare(Client c1, Client c2) {
+				return (int) Math.ceil(c2.getDebts() - c1.getDebts());
+			}
+		});
 		return clients;
 	}
 
