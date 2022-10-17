@@ -114,6 +114,7 @@ public class Network implements Serializable {
 	private void importClient(String[] fields) throws IllegalEntryException {
 		try {
 			this.registerClient(fields[1], fields[2], Integer.parseInt(fields[3]));
+			this.dirty();
 		} catch (DuplicateClientKeyException e) {
 			throw new IllegalEntryException(fields);
 		}
@@ -130,6 +131,7 @@ public class Network implements Serializable {
 	private void importTerminal(String[] fields) throws IllegalEntryException {
 		try {
 			this.registerTerminal(fields[1], fields[0], fields[2], fields[3]);
+			this.dirty();
 		} catch (DuplicateTerminalKeyException | InvalidTerminalKeyException
 				| UnknownClientKeyException e) {
 			throw new IllegalEntryException(fields);
@@ -150,6 +152,7 @@ public class Network implements Serializable {
 			Terminal terminal = getTerminal(fields[1]);
 			for (String friendkey : friendskeys) {
 				terminal.insertFriend(friendkey, getTerminal(friendkey));
+				this.dirty();
 			}
 		} catch (UnknownTerminalKeyException e) {
 			throw new IllegalEntryException(fields);
@@ -319,6 +322,7 @@ public class Network implements Serializable {
 	public void addFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
 		if (!terminal.getKey().equals(key))
 			terminal.insertFriend(key, getTerminal(key));
+		this.dirty();
 	}
 
 	/**
@@ -330,6 +334,7 @@ public class Network implements Serializable {
 	 */
 	public void removeFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
 		terminal.deleteFriend(key);
+		this.dirty();
 	}
 
 	/**
