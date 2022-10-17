@@ -312,7 +312,8 @@ public class Network implements Serializable {
 	 * @throws UnknownTerminalKeyException if the terminal key does not exist
 	 */
 	public void addFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
-		terminal.insertFriend(key, getTerminal(key));
+		if (!terminal.getKey().equals(key))
+			terminal.insertFriend(key, getTerminal(key));
 	}
 
 	/**
