@@ -16,7 +16,9 @@ import prr.exceptions.UnrecognizedEntryException;
 import prr.exceptions.UnknownClientKeyException;
 import prr.exceptions.UnknownTerminalKeyException;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -325,6 +327,20 @@ public class Network implements Serializable {
 	 */
 	public void removeFriend(Terminal terminal, String key) throws UnknownTerminalKeyException {
 		terminal.deleteFriend(key);
+	}
+
+	/**
+	 * Gets all the terminals without any debts
+	 * 
+	 * @return List of terminals without any debts
+	 */
+	public List<Client> getClientsWithoutDebt() {
+		List<Client> clients = new ArrayList<Client>();
+		for (Client client : _clients.values()) {
+			if (client.getDebts() == 0)
+				clients.add(client);
+		}
+		return clients;
 	}
 
 }
