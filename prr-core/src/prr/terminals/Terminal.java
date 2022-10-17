@@ -38,7 +38,6 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * Constructor.
          * 
          * @param key    the terminal's key
-         * @param type   the terminal's type
          * @param client the terminal's owner
          */
         public Terminal(String key, String client) {

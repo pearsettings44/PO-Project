@@ -365,4 +365,17 @@ public class Network implements Serializable {
 		return clients;
 	}
 
+	/**
+	 * Get all the terminals with a positive balance
+	 * 
+	 * @return all the terminals with a positive balance
+	 */
+	public List<Terminal> getTerminalsWithPositiveBalance() {
+		List<Terminal> terminals = new ArrayList<Terminal>();
+		for (Terminal terminal : _terminals.values())
+			if (terminal.getPayments() > terminal.getDebts())
+				terminals.add(terminal);
+		return terminals;
+	}
+
 }
