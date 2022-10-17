@@ -227,11 +227,12 @@ public class Network implements Serializable {
 			Terminal terminal = new BasicTerminal(key, clientKey);
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
-		} else {
+		} else if (type.equals("FANCY")) {
 			Terminal terminal = new FancyTerminal(key, clientKey);
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
-		}
+		} else
+			throw new InvalidTerminalKeyException(key);
 		this.dirty();
 	}
 
