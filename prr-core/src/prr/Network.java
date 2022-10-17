@@ -378,4 +378,48 @@ public class Network implements Serializable {
 		return terminals;
 	}
 
+	/**
+	 * Get the total amount of payments made in the network
+	 * 
+	 * @return the total amount of payments made in the network
+	 */
+	public long getTotalPayments() {
+		double total = 0;
+		for (Client client : _clients.values())
+			total += client.getPayments();
+		return (long) total;
+	}
+
+	/**
+	 * Get the total amount of debts in the network
+	 * 
+	 * @return the total amount of debts in the network
+	 */
+	public long getTotalDebts() {
+		double total = 0;
+		for (Client client : _clients.values())
+			total += client.getDebts();
+		return (long) total;
+	}
+
+	/**
+	 * Get the amount of debt from a client
+	 * 
+	 * @param key Client key
+	 * @return the amount of debt from the client
+	 */
+	public long getClientDebts(String key) {
+		return (long) _clients.get(key).getDebts();
+	}
+
+	/**
+	 * Get the amount of payments made by a client
+	 * 
+	 * @param key Client key
+	 * @return the amount of payments made by the client
+	 */
+	public long getClientPayments(String key) {
+		return (long) _clients.get(key).getPayments();
+	}
+
 }
