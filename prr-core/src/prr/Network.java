@@ -427,5 +427,4 @@ public class Network implements Serializable {
 	public long getClientPayments(String key) {
 		return (long) _clients.get(key).getPayments();
 	}
-
 }
