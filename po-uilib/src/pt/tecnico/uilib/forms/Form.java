@@ -106,14 +106,14 @@ public class Form {
 		add(key, new FieldInteger(label));
 	}
 
-//  /**
-//   * @param key
-//   * @param label
-//   * @param options
-//   */
-//  public void addOptionField(String key, String label, String[] options) {
-//    add(key, new FieldOption(label, options));
-//  }
+	// /**
+	// * @param key
+	// * @param label
+	// * @param options
+	// */
+	// public void addOptionField(String key, String label, String[] options) {
+	// add(key, new FieldOption(label, options));
+	// }
 
 	/**
 	 * @param key
@@ -238,7 +238,7 @@ public class Form {
 	public static String requestString(String prompt) {
 		Form request = new Form();
 		request.addStringField("answer", prompt);
-		return request.parse().client("answer");
+		return request.parse().stringField("answer");
 	}
 
 	public static String requestOption(String prompt, String... options) {
