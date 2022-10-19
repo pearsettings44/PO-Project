@@ -48,7 +48,7 @@ public class Network implements Serializable {
 	 * Network's dirty state, which represents if the network was modified since
 	 * the last time it was saved/created.
 	 */
-	private boolean dirty = false;
+	private boolean _dirty = false;
 
 	/**
 	 * Get the network's dirty state.
@@ -56,37 +56,50 @@ public class Network implements Serializable {
 	 * @return the network's dirty state
 	 */
 	public boolean isDirty() {
-		return this.dirty;
+		return _dirty;
 	}
 
 	/**
 	 * Set the dirty flag to false, representing that the network has been saved
 	 */
 	public void clean() {
-		this.dirty = false;
+		_dirty = false;
 	}
 
 	/**
 	 * Set the dirty flag to true, representing that the network has been modified
 	 */
 	private void dirty() {
-		this.dirty = true;
+		_dirty = true;
 	}
 
+	/**
+	 * Get a certain terminal
+	 * 
+	 * @param key the terminal's key
+	 * @return the terminal
+	 * @throws UnknownTerminalKeyException if the key does not belong to any
+	 *                                     terminal
+	 */
 	public Terminal getTerminal(String key) throws UnknownTerminalKeyException {
-		if (!_terminals.containsKey(key)) {
+		if (!_terminals.containsKey(key))
 			throw new UnknownTerminalKeyException(key);
-		} else {
+		else
 			return _terminals.get(key);
-		}
 	}
 
+	/**
+	 * Get a certain client
+	 * 
+	 * @param key the client's key
+	 * @return the client
+	 * @throws UnknownClientKeyException if the key does not belong to any client
+	 */
 	public Client getClient(String key) throws UnknownClientKeyException {
-		if (!_clients.containsKey(key)) {
+		if (!_clients.containsKey(key))
 			throw new UnknownClientKeyException(key);
-		} else {
+		else
 			return _clients.get(key);
-		}
 	}
 
 	/**
@@ -147,11 +160,11 @@ public class Network implements Serializable {
 	 * @throws IllegalEntryException if the entry contains an illegal field
 	 */
 	private void importFriends(String[] fields) throws IllegalEntryException {
-		String[] friendskeys = fields[2].split(",");
+		String[] friendsKeys = fields[2].split(",");
 		try {
 			Terminal terminal = getTerminal(fields[1]);
-			for (String friendkey : friendskeys) {
-				terminal.insertFriend(friendkey, getTerminal(friendkey));
+			for (String friendKey : friendsKeys) {
+				terminal.insertFriend(friendKey, getTerminal(friendKey));
 				this.dirty();
 			}
 		} catch (UnknownTerminalKeyException e) {
@@ -183,7 +196,7 @@ public class Network implements Serializable {
 	 * 
 	 * @param filename name of the text input file
 	 * @throws UnrecognizedEntryException if some entry is not correct
-	 * @throws IOException                if there is an IO erro while processing
+	 * @throws IOException                if there is an IO error while processing
 	 *                                    the text file
 	 */
 	void importFile(String filename) throws UnrecognizedEntryException, IOException, IllegalEntryException {
