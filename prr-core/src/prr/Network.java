@@ -28,10 +28,8 @@ import prr.terminals.Terminal;
 import prr.terminals.BasicTerminal;
 import prr.terminals.FancyTerminal;
 
-// FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
-
 /**
- * Class Store implements a store.
+ * Class Network implements a network.
  */
 public class Network implements Serializable {
 
@@ -39,7 +37,7 @@ public class Network implements Serializable {
 	private static final long serialVersionUID = 202208091753L;
 
 	/* Clients */
-	private Map<String, Client> _clients = new TreeMap<>();
+	private Map<String, Client> _clients = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/* Terminals */
 	private Map<String, Terminal> _terminals = new TreeMap<>();
@@ -134,11 +132,11 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Parse and import a basic terminal entry from a plain text file.
-	 * A correct basic terminal entry has the following format:
-	 * {@code BASIC|key|ClientKey|State}
+	 * Parse and import a terminal entry from a plain text file.
+	 * A correct terminal entry has the following format:
+	 * {@code TYPE|key|ClientKey|State}
 	 *
-	 * @param fields The fields of the client to import
+	 * @param fields The fields of the terminal to import
 	 * @throws IllegalEntryException if the entry contains an illegal field
 	 */
 	private void importTerminal(String[] fields) throws IllegalEntryException {
@@ -192,7 +190,7 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Read text input file and create corresponding entities.
+	 * Read text input file and create corresponding entries.
 	 * 
 	 * @param filename name of the text input file
 	 * @throws UnrecognizedEntryException if some entry is not correct
