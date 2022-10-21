@@ -235,7 +235,7 @@ public class Network implements Serializable {
 			throw new DuplicateTerminalKeyException(key);
 		if (!_clients.containsKey(clientKey))
 			throw new UnknownClientKeyException(clientKey);
-		if (key.matches("[0-9]+") && key.length() != 6)
+		if (!key.matches("[0-9]+") || key.length() != 6)
 			throw new InvalidTerminalKeyException(key);
 		if (type.equals("BASIC")) {
 			Terminal terminal = new BasicTerminal(key, clientKey);
