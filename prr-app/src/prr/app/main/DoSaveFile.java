@@ -32,7 +32,7 @@ class DoSaveFile extends Command<NetworkManager> {
 		try {
 			_receiver.saveAs(Form.requestString(Prompt.newSaveAs()));
 		} catch (MissingFileAssociationException e) {
-			saveAs();
+			e.printStackTrace();
 		}
 	}
 }
