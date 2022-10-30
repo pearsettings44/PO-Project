@@ -425,8 +425,8 @@ public class Network implements Serializable {
 	 * @param key Client key
 	 * @return the amount of debt from the client
 	 */
-	public long getClientDebts(String key) {
-		return (long) _clients.get(key).getDebts();
+	public long getClientDebts(String key) throws UnknownClientKeyException {
+		return (long) getClient(key).getDebts();
 	}
 
 	/**
@@ -435,7 +435,7 @@ public class Network implements Serializable {
 	 * @param key Client key
 	 * @return the amount of payments made by the client
 	 */
-	public long getClientPayments(String key) {
-		return (long) _clients.get(key).getPayments();
+	public long getClientPayments(String key) throws UnknownClientKeyException {
+		return (long) getClient(key).getPayments();
 	}
 }
