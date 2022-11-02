@@ -42,6 +42,8 @@ public class Network implements Serializable {
 	/* Terminals */
 	private Map<String, Terminal> _terminals = new TreeMap<>();
 
+	private Map<Integer, Communication> _communications = new TreeMap<>();
+
 	/**
 	 * Network's dirty state, which represents if the network was modified since
 	 * the last time it was saved/created.
