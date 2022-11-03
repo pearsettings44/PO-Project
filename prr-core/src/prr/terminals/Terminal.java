@@ -1,9 +1,14 @@
 package prr.terminals;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
+import prr.Notifications.Notifiable;
+import prr.Notifications.Notification;
+import prr.Notifications.NotificationSender;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.exceptions.InvalidCommunicationException;
@@ -14,7 +19,7 @@ import prr.exceptions.NoOngoingCommunicationException;
 /**
  * Abstract terminal.
  */
-abstract public class Terminal implements Serializable /* FIXME maybe addd more interfaces */ {
+abstract public class Terminal implements Serializable, NotificationSender /* FIXME maybe addd more interfaces */ {
 
         /** Serial number for serialization. */
         private static final long serialVersionUID = 202208091753L;
@@ -40,6 +45,12 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private Map<String, Terminal> _friends = new TreeMap<>();
 
         private Map<Integer, Communication> _communications = new TreeMap<>();
+
+        private final Set<Notifiable> subscribers = new HashSet<>();
+
+        public Set<Notifiable> getsubscribers() {
+                return subscribers;
+        }
 
         /**
          * Constructor.
@@ -292,5 +303,34 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          **/
         public boolean canStartCommunication() {
                 return !(getState().equals("OFF")) && !(getState().equals("BUSY"));
+        }
+
+        @Override
+        public void subscribe(Notifiable notifiable) {
+                this.subscribers.add(notifiable);
+        }
+
+        @Override
+        public void unsubscribe(Notifiable notifiable) {
+                this.subscribers.remove(notifiable);
+        }
+
+        @Override
+        public boolean isSubscribed(Notifiable notifiable) {
+                return this.subscribers.contains(notifiable);
+        }
+
+        @Override
+        public void toggleSubscription(Notifiable notifiable) {
+                if (this.isSubscribed(notifiable)) {
+                        this.unsubscribe(notifiable);
+                } else {
+                        this.subscribe(notifiable);
+                }
+        }
+
+        @Override
+        public void sendNotification(Notification notification) {
+                this.subscribers.forEach(subscriber -> subscriber.notify(notification));
         }
 }

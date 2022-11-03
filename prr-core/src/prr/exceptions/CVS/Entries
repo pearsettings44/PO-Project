@@ -10,4 +10,15 @@
 /UnknownClientKeyException.java/1.1/Wed Oct 19 10:31:55 2022//
 /UnknownTerminalKeyException.java/1.1/Wed Oct 19 10:31:55 2022//
 /UnrecognizedEntryException.java/1.2/Wed Oct 19 10:31:55 2022//
+/DestinationIsBusyException.java/1.1/Wed Nov  2 21:56:57 2022//
+/DestinationIsOffException.java/1.1/Wed Nov  2 23:30:33 2022//
+/DestinationIsSilentException.java/1.1/Wed Nov  2 21:56:28 2022//
+/InvalidCommunicationException.java/1.1/Thu Nov  3 08:53:05 2022//
+/NoOngoingCommunicationException.java/1.1/Wed Nov  2 22:46:38 2022//
+/TerminalAlreadyBusyException.java/1.1/Thu Nov  3 07:43:22 2022//
+/TerminalAlreadyOffException.java/1.1/Wed Nov  2 21:21:51 2022//
+/TerminalAlreadyOnException.java/1.1/Wed Nov  2 21:22:17 2022//
+/TerminalAlreadySilentException.java/1.1/Wed Nov  2 21:22:35 2022//
+/UnsupportedAtDestinationException.java/1.1/Wed Nov  2 21:56:06 2022//
+/UnsupportedAtOriginException.java/1.1/Wed Nov  2 21:55:33 2022//
 D

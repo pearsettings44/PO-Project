@@ -5,6 +5,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import prr.Notifications.B2INotification;
+import prr.Notifications.Notification;
+import prr.Notifications.O2INotification;
+import prr.Notifications.O2SNotification;
+import prr.Notifications.S2INotification;
 import prr.clients.Client;
 import prr.communications.Communication;
 import prr.communications.InteractiveCommunication;
@@ -147,6 +152,7 @@ public class Network implements Serializable {
 
 	/**
 	 * Get all terminais with any usage (no communications)
+	 * 
 	 * @return all terminals with any usage
 	 */
 	public Collection<Terminal> unusedTerminals() {
@@ -491,6 +497,14 @@ public class Network implements Serializable {
 		return (long) getClient(key).getPayments();
 	}
 
+	public Collection<Notification> readClientInAppNotifications(
+			String clientId)
+			throws UnknownClientKeyException {
+		final Client partner = this.getClient(clientId);
+
+		return partner.readInAppNotifications();
+	}
+
 	/**
 	 * Turn a terminal off
 	 * 
@@ -518,6 +532,14 @@ public class Network implements Serializable {
 		String terminalState = terminal.getState();
 		if (terminalState.equals("IDLE"))
 			throw new TerminalAlreadyOnException();
+		else if (terminalState.equals("OFF")) {
+			terminal.sendNotification(new O2INotification(terminal));
+		} else if (terminalState.equals("SILENCE")) {
+			terminal.sendNotification(new S2INotification(terminal));
+		} else if (terminalState.equals("BUSY")) {
+			terminal.sendNotification(new B2INotification(terminal));
+		} else
+			return;
 		terminal.setPrevState(terminalState);
 		terminal.setState(new IdleTerminal(terminal));
 		this.dirty();
@@ -533,6 +555,9 @@ public class Network implements Serializable {
 		String terminalState = terminal.getState();
 		if (terminalState.equals("SILENCE"))
 			throw new TerminalAlreadySilentException();
+		if (terminalState.equals("OFF")) {
+			terminal.sendNotification(new O2SNotification(terminal));
+		}
 		terminal.setPrevState(terminalState);
 		terminal.setState(new SilenceTerminal(terminal));
 		this.dirty();
@@ -602,9 +627,10 @@ public class Network implements Serializable {
 	public void sendTextCommunication(Terminal sender, String receiverKey, String message)
 			throws UnknownTerminalKeyException, DestinationIsOffException {
 		Terminal receiver = getTerminal(receiverKey);
-		if (receiver.getState().equals("OFF"))
+		if (receiver.getState().equals("OFF")) {
+			receiver.subscribe(sender.getClient());
 			throw new DestinationIsOffException();
-		else {
+		} else {
 			int id = uniqueId();
 			TextCommunication communication = new TextCommunication(
 					id, sender, receiver, message);
@@ -646,13 +672,16 @@ public class Network implements Serializable {
 			throw new UnsupportedAtOriginException();
 		else if (receiver.getType().equals("BASIC") && communicationType.equals("VIDEO"))
 			throw new UnsupportedAtDestinationException();
-		else if (receiverState.equals("OFF"))
+		else if (receiverState.equals("OFF")) {
+			receiver.subscribe(sender.getClient());
 			throw new DestinationIsOffException();
-		else if (receiverState.equals("SILENCE"))
+		} else if (receiverState.equals("SILENCE")) {
+			receiver.subscribe(sender.getClient());
 			throw new DestinationIsSilentException();
-		else if (receiverState.equals("BUSY"))
+		} else if (receiverState.equals("BUSY")) {
+			receiver.subscribe(sender.getClient());
 			throw new DestinationIsBusyException();
-		else {
+		} else {
 			int id = uniqueId();
 			InteractiveCommunication communication = new InteractiveCommunication(id, sender,
 					receiver, communicationType);

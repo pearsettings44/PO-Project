@@ -2,15 +2,20 @@ package prr.clients;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
+import prr.Notifications.Notifiable;
+import prr.Notifications.Notification;
+import prr.Notifications.NotificationDeliveryMethod;
 import prr.TarrifPlans.BaseTarrifPlan;
 import prr.TarrifPlans.TarrifPlan;
 import prr.communications.Communication;
 import prr.terminals.Terminal;
 
-public class Client implements Serializable {
+public class Client implements Serializable, Notifiable {
 
     /** Serial number for serialization. */
     private static final long serialVersionUID = 202210121030L;
@@ -24,12 +29,6 @@ public class Client implements Serializable {
     /** The client's tax id number. */
     private int _taxId;
 
-    /** Total payments made by this client. */
-    private float _payments;
-
-    /** Total debts of this client. */
-    private float _debts;
-
     /** Notifications setting. */
     private boolean _notifiable;
 
@@ -40,6 +39,9 @@ public class Client implements Serializable {
     private Map<String, Terminal> _terminals;
 
     private TarrifPlan _tarrifPlan;
+
+    private final Queue<Notification> inAppNotifications = new LinkedList<>();
+    private NotificationDeliveryMethod notificationDeliveryMethod = inAppNotifications::add;
 
     /**
      * Constructor.
@@ -204,6 +206,11 @@ public class Client implements Serializable {
 
     }
 
+    // get inAppNotifications
+    public Queue<Notification> getInAppNotifications() {
+        return inAppNotifications;
+    }
+
     @Override
     public String toString() {
         return String.format("CLIENT|%s|%s|%d|%s|%s|%d|%d|%d", _key, _name, _taxId,
@@ -211,4 +218,23 @@ public class Client implements Serializable {
                 numberOfTerminals(), Math.round(getPayments()),
                 Math.round(getDebts()));
     }
+
+    public Collection<Notification> readInAppNotifications() {
+        Collection<Notification> notifications = new LinkedList<>(
+                this.inAppNotifications);
+        this.inAppNotifications.clear();
+        return notifications;
+    }
+
+    @Override
+    public void notify(Notification notification) {
+        notificationDeliveryMethod.deliver(notification);
+    }
+
+    @Override
+    public void setNotificationDeliveryMethod(
+            NotificationDeliveryMethod deliveryMethod) {
+        this.notificationDeliveryMethod = deliveryMethod;
+    }
+
 }

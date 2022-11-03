@@ -20,6 +20,8 @@ class DoShowClient extends Command<Network> {
 		String key = stringField("key");
 		try {
 			_display.popup(_receiver.getClient(key));
+			_receiver.readClientInAppNotifications(stringField("key")).stream()
+					.forEach(notification -> _display.popup(notification));
 		} catch (prr.exceptions.UnknownClientKeyException e) {
 			throw new UnknownClientKeyException(key);
 		}

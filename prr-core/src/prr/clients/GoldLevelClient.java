@@ -19,7 +19,9 @@ public class GoldLevelClient extends Client.Level {
         int size = communications.size();
         if (size < 5)
             return;
-        List<Communication> lastFiveCommunications = communications.stream().skip(communications.size() - 5).filter(com -> com.getType().equals("VIDEO")).collect(Collectors.toList());
+        List<Communication> lastFiveCommunications = communications.stream().skip(communications.size() - 5)
+                .filter(com -> com.getType().equals("VIDEO") && com.getSender().getType().equals("GOLD"))
+                .collect(Collectors.toList());
         if (lastFiveCommunications.size() == 5 && balance >= 0)
             this.setLevel(new PlatinumLevelClient(this.getClient()));
     }
