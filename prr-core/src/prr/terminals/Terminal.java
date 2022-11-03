@@ -48,10 +48,6 @@ abstract public class Terminal implements Serializable, NotificationSender /* FI
 
         private final Set<Notifiable> subscribers = new HashSet<>();
 
-        public Set<Notifiable> getsubscribers() {
-                return subscribers;
-        }
-
         /**
          * Constructor.
          * 
@@ -310,24 +306,12 @@ abstract public class Terminal implements Serializable, NotificationSender /* FI
                 this.subscribers.add(notifiable);
         }
 
-        @Override
-        public void unsubscribe(Notifiable notifiable) {
-                this.subscribers.remove(notifiable);
-        }
 
         @Override
-        public boolean isSubscribed(Notifiable notifiable) {
-                return this.subscribers.contains(notifiable);
+        public void unsubscribeAll() {
+                this.subscribers.clear();
         }
 
-        @Override
-        public void toggleSubscription(Notifiable notifiable) {
-                if (this.isSubscribed(notifiable)) {
-                        this.unsubscribe(notifiable);
-                } else {
-                        this.subscribe(notifiable);
-                }
-        }
 
         @Override
         public void sendNotification(Notification notification) {

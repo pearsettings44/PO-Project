@@ -38,10 +38,14 @@ public class Client implements Serializable, Notifiable {
     /** Client terminals */
     private Map<String, Terminal> _terminals;
 
+    /** Client tarrif plan */
     private TarrifPlan _tarrifPlan;
 
-    private final Queue<Notification> inAppNotifications = new LinkedList<>();
-    private NotificationDeliveryMethod notificationDeliveryMethod = inAppNotifications::add;
+    /** Client notifications */
+    private final Queue<Notification> _inAppNotifications = new LinkedList<>();
+
+    /** Client notification delivery method */
+    private NotificationDeliveryMethod notificationDeliveryMethod = _inAppNotifications::add;
 
     /**
      * Constructor.
@@ -64,17 +68,26 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
+     * Get the client's key.
+     * 
      * @return the client's key
      */
     public String getKey() {
         return _key;
     }
 
+    /**
+     * Get the client's tarrif plan.
+     * 
+     * @return the client's tarrif plan
+     */
     public TarrifPlan getTarrifPlan() {
         return _tarrifPlan;
     }
 
     /**
+     * Get the client's name
+     * 
      * @return the client's name
      */
     public String getName() {
@@ -82,6 +95,8 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
+     *  Get the client's tax id number
+     * 
      * @return the client's tax id number
      */
     public int getTaxId() {
@@ -89,6 +104,8 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
+     * Get the client's total payments made.
+     * 
      * @return the total payments made by this client
      */
     public float getPayments() {
@@ -99,6 +116,8 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
+     * Get the client's total debts.
+     * 
      * @return the total debts of this client
      */
     public float getDebts() {
@@ -110,7 +129,9 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
-     * @return the notifications setting
+     * Get the client's notifications settings.
+     * 
+     * @return the notifications settings
      */
     public boolean getNotifiable() {
         return _notifiable;
@@ -131,6 +152,8 @@ public class Client implements Serializable, Notifiable {
     }
 
     /**
+     * Get the number of terminals of this client.
+     * 
      * @return the client's number of terminals
      */
     public int numberOfTerminals() {
@@ -139,6 +162,8 @@ public class Client implements Serializable, Notifiable {
 
     /**
      * Adds a terminal to the client's terminals
+     * 
+     * @param terminal the terminal to add
      */
     public void addTerminal(Terminal terminal) {
         _terminals.put(terminal.getKey(), terminal);
@@ -146,11 +171,19 @@ public class Client implements Serializable, Notifiable {
 
     /**
      * Gets a terminal from the client's terminals
+     * 
+     * @param key the terminal's key
+     * @return the terminal
      */
     public Terminal getTerminal(String key) {
         return _terminals.get(key);
     }
 
+    /**
+     * Get the client level
+     * 
+     * @return the client level
+     */
     public Level getLevel() {
         return _level;
     }
@@ -208,7 +241,7 @@ public class Client implements Serializable, Notifiable {
 
     // get inAppNotifications
     public Queue<Notification> getInAppNotifications() {
-        return inAppNotifications;
+        return _inAppNotifications;
     }
 
     @Override
@@ -220,9 +253,8 @@ public class Client implements Serializable, Notifiable {
     }
 
     public Collection<Notification> readInAppNotifications() {
-        Collection<Notification> notifications = new LinkedList<>(
-                this.inAppNotifications);
-        this.inAppNotifications.clear();
+        Collection<Notification> notifications = new LinkedList<>(_inAppNotifications);
+        _inAppNotifications.clear();
         return notifications;
     }
 

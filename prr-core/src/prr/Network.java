@@ -64,6 +64,7 @@ public class Network implements Serializable {
 	/* Terminals */
 	private Map<String, Terminal> _terminals = new TreeMap<>();
 
+	/* Communications */
 	private Map<Integer, Communication> _communications = new TreeMap<>();
 
 	/* Communication unique Id */
@@ -118,8 +119,7 @@ public class Network implements Serializable {
 	public Terminal getTerminal(String key) throws UnknownTerminalKeyException {
 		if (!_terminals.containsKey(key))
 			throw new UnknownTerminalKeyException(key);
-		else
-			return _terminals.get(key);
+		return _terminals.get(key);
 	}
 
 	/**
@@ -132,11 +132,12 @@ public class Network implements Serializable {
 	public Client getClient(String key) throws UnknownClientKeyException {
 		if (!_clients.containsKey(key))
 			throw new UnknownClientKeyException(key);
-		else
-			return _clients.get(key);
+		return _clients.get(key);
 	}
 
 	/**
+	 * Get all clients
+	 * 
 	 * @return all clients
 	 */
 	public Collection<Client> clients() {
@@ -144,6 +145,8 @@ public class Network implements Serializable {
 	}
 
 	/**
+	 * Get all terminals
+	 * 
 	 * @return all terminals
 	 */
 	public Collection<Terminal> terminals() {
@@ -151,21 +154,21 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Get all terminais with any usage (no communications)
+	 * Get all terminals with any usage (no communications)
 	 * 
 	 * @return all terminals with any usage
 	 */
 	public Collection<Terminal> unusedTerminals() {
 		List<Terminal> unusedTerminals = new ArrayList<>();
-		for (Terminal terminal : _terminals.values()) {
-			if (terminal.hasNoCommunications()) {
+		for (Terminal terminal : _terminals.values())
+			if (terminal.hasNoCommunications())
 				unusedTerminals.add(terminal);
-			}
-		}
 		return unusedTerminals;
 	}
 
 	/**
+	 * Get all communications
+	 * 
 	 * @return all communications
 	 */
 	public Collection<Communication> communications() {
@@ -407,16 +410,15 @@ public class Network implements Serializable {
 	}
 
 	/**
-	 * Gets all the terminals without any debts
+	 * Gets all the clients without any debts
 	 * 
-	 * @return List of terminals without any debts
+	 * @return List of clients without any debts
 	 */
 	public List<Client> getClientsWithoutDebt() {
 		List<Client> clients = new ArrayList<Client>();
-		for (Client client : _clients.values()) {
+		for (Client client : _clients.values())
 			if (client.getDebts() == 0)
 				clients.add(client);
-		}
 		return clients;
 	}
 
@@ -427,10 +429,10 @@ public class Network implements Serializable {
 	 */
 	public List<Client> getClientsWithDebt() {
 		List<Client> clients = new ArrayList<Client>();
-		for (Client client : _clients.values()) {
+		for (Client client : _clients.values())
 			if (client.getDebts() > 0)
 				clients.add(client);
-		}
+
 		Collections.sort(clients, new Comparator<Client>() {
 			@Override
 			public int compare(Client c1, Client c2) {
@@ -482,6 +484,7 @@ public class Network implements Serializable {
 	 * 
 	 * @param key Client key
 	 * @return the amount of debt from the client
+	 * @throws UnknownClientKeyException if the client key does not exist
 	 */
 	public long getClientDebts(String key) throws UnknownClientKeyException {
 		return (long) getClient(key).getDebts();
@@ -492,17 +495,21 @@ public class Network implements Serializable {
 	 * 
 	 * @param key Client key
 	 * @return the amount of payments made by the client
+	 * @throws UnknownClientKeyException if the client key does not exist
 	 */
 	public long getClientPayments(String key) throws UnknownClientKeyException {
 		return (long) getClient(key).getPayments();
 	}
 
-	public Collection<Notification> readClientInAppNotifications(
-			String clientId)
-			throws UnknownClientKeyException {
-		final Client partner = this.getClient(clientId);
-
-		return partner.readInAppNotifications();
+	/**
+	 * Read the clients in App notifications
+	 * 
+	 * @param key Client key
+	 * @return the notifications of the client
+	 * @throws UnknownClientKeyException if the client key does not exist
+	 */
+	public Collection<Notification> readClientInAppNotifications(String key) throws UnknownClientKeyException {
+		return getClient(key).readInAppNotifications();
 	}
 
 	/**
@@ -513,13 +520,17 @@ public class Network implements Serializable {
 	 */
 	public void turnTerminalOff(Terminal terminal) throws TerminalAlreadyOffException {
 		String terminalState = terminal.getState();
-		if (terminalState.equals("OFF"))
-			throw new TerminalAlreadyOffException();
-		if (terminalState.equals("BUSY"))
-			return;
-		terminal.setPrevState(terminalState);
-		terminal.setState(new OffTerminal(terminal));
-		this.dirty();
+		switch (terminalState) {
+			case "OFF":
+				throw new TerminalAlreadyOffException();
+			case "BUSY":
+				return;
+			default:
+				terminal.setPrevState(terminalState);
+				terminal.setState(new OffTerminal(terminal));
+				this.dirty();
+				break;
+		}
 	}
 
 	/**
@@ -530,19 +541,33 @@ public class Network implements Serializable {
 	 */
 	public void turnTerminalOn(Terminal terminal) throws TerminalAlreadyOnException {
 		String terminalState = terminal.getState();
-		if (terminalState.equals("IDLE"))
-			throw new TerminalAlreadyOnException();
-		else if (terminalState.equals("OFF")) {
-			terminal.sendNotification(new O2INotification(terminal));
-		} else if (terminalState.equals("SILENCE")) {
-			terminal.sendNotification(new S2INotification(terminal));
-		} else if (terminalState.equals("BUSY")) {
-			terminal.sendNotification(new B2INotification(terminal));
-		} else
-			return;
-		terminal.setPrevState(terminalState);
-		terminal.setState(new IdleTerminal(terminal));
-		this.dirty();
+		switch (terminalState) {
+			case "IDLE":
+				throw new TerminalAlreadyOnException();
+			case "OFF":
+				terminal.sendNotification(new O2INotification(terminal));
+				terminal.unsubscribeAll();
+				terminal.setPrevState(terminalState);
+				terminal.setState(new IdleTerminal(terminal));
+				this.dirty();
+				break;
+			case "SILENCE":
+				terminal.sendNotification(new S2INotification(terminal));
+				terminal.unsubscribeAll();
+				terminal.setPrevState(terminalState);
+				terminal.setState(new IdleTerminal(terminal));
+				this.dirty();
+				break;
+			case "BUSY":
+				terminal.sendNotification(new B2INotification(terminal));
+				terminal.unsubscribeAll();
+				terminal.setPrevState(terminalState);
+				terminal.setState(new IdleTerminal(terminal));
+				this.dirty();
+				break;
+			default:
+				return;
+		}
 	}
 
 	/**
@@ -553,14 +578,22 @@ public class Network implements Serializable {
 	 */
 	public void turnTerminalSilent(Terminal terminal) throws TerminalAlreadySilentException {
 		String terminalState = terminal.getState();
-		if (terminalState.equals("SILENCE"))
-			throw new TerminalAlreadySilentException();
-		if (terminalState.equals("OFF")) {
-			terminal.sendNotification(new O2SNotification(terminal));
+		switch (terminalState) {
+			case "SILENCE":
+				throw new TerminalAlreadySilentException();
+			case "OFF":
+				terminal.sendNotification(new O2SNotification(terminal));
+				terminal.unsubscribeAll();
+				terminal.setPrevState(terminalState);
+				terminal.setState(new SilenceTerminal(terminal));
+				this.dirty();
+				break;
+			default:
+				terminal.setPrevState(terminalState);
+				terminal.setState(new SilenceTerminal(terminal));
+				this.dirty();
+				break;
 		}
-		terminal.setPrevState(terminalState);
-		terminal.setState(new SilenceTerminal(terminal));
-		this.dirty();
 	}
 
 	/**
@@ -571,13 +604,17 @@ public class Network implements Serializable {
 	 */
 	public void turnTerminalBusy(Terminal terminal) throws TerminalAlreadyBusyException {
 		String terminalState = terminal.getState();
-		if (terminalState.equals("BUSY"))
-			throw new TerminalAlreadyBusyException();
-		if (terminalState.equals("OFF"))
-			return;
-		terminal.setPrevState(terminalState);
-		terminal.setState(new BusyTerminal(terminal));
-		this.dirty();
+		switch (terminalState) {
+			case "BUSY":
+				throw new TerminalAlreadyBusyException();
+			case "OFF":
+				return;
+			default:
+				terminal.setPrevState(terminalState);
+				terminal.setState(new BusyTerminal(terminal));
+				this.dirty();
+				break;
+		}
 	}
 
 	/**
@@ -609,10 +646,24 @@ public class Network implements Serializable {
 		this.dirty();
 	}
 
+	/**
+	 * Get the communications sent from the client
+	 * 
+	 * @param key Client key
+	 * @return the Client's sent communications
+	 * @throws UnknownClientKeyException if the client key does not exist
+	 */
 	public Collection<Communication> communicationsFromClient(String key) throws UnknownClientKeyException {
 		return getClient(key).getSentCommunications();
 	}
 
+	/**
+	 * Get the communications received to the client
+	 * 
+	 * @param key Client key
+	 * @return the Client's received communications
+	 * @throws UnknownClientKeyException if the client key does not exist
+	 */
 	public Collection<Communication> communicationsToClient(String key) throws UnknownClientKeyException {
 		return getClient(key).getReceivedCommunications();
 	}
@@ -623,25 +674,29 @@ public class Network implements Serializable {
 	 * @param originTerminal         Terminal sending the communication
 	 * @param destinationTerminalKey Key of the destination terminal
 	 * @param message                Message to send
+	 * @throws UnknownTerminalKeyException if the destination terminal key does not
+	 *                                     exist
+	 * @throws TerminalOffException        if the destination terminal is off
 	 */
 	public void sendTextCommunication(Terminal sender, String receiverKey, String message)
 			throws UnknownTerminalKeyException, DestinationIsOffException {
 		Terminal receiver = getTerminal(receiverKey);
 		if (receiver.getState().equals("OFF")) {
-			receiver.subscribe(sender.getClient());
+			if (receiver.getClient().getNotifiable())
+				receiver.subscribe(sender.getClient());
 			throw new DestinationIsOffException();
-		} else {
-			int id = uniqueId();
-			TextCommunication communication = new TextCommunication(
-					id, sender, receiver, message);
-			double price = communication.calculatePrice();
-			communication.setPrice(price);
-			sender.addDebt((long) price);
-			_communications.put(id, communication);
-			receiver.addCommunication(communication);
-			sender.addCommunication(communication);
-			this.dirty();
 		}
+
+		int id = uniqueId();
+		TextCommunication communication = new TextCommunication(id, sender, receiver, message);
+		double price = communication.calculatePrice();
+		communication.setPrice(price);
+		sender.addDebt((long) price);
+		_communications.put(id, communication);
+		receiver.addCommunication(communication);
+		sender.addCommunication(communication);
+		this.dirty();
+
 	}
 
 	/**
@@ -673,18 +728,21 @@ public class Network implements Serializable {
 		else if (receiver.getType().equals("BASIC") && communicationType.equals("VIDEO"))
 			throw new UnsupportedAtDestinationException();
 		else if (receiverState.equals("OFF")) {
-			receiver.subscribe(sender.getClient());
+			if (receiver.getClient().getNotifiable())
+				receiver.subscribe(sender.getClient());
 			throw new DestinationIsOffException();
 		} else if (receiverState.equals("SILENCE")) {
-			receiver.subscribe(sender.getClient());
+			if (receiver.getClient().getNotifiable())
+				receiver.subscribe(sender.getClient());
 			throw new DestinationIsSilentException();
 		} else if (receiverState.equals("BUSY")) {
-			receiver.subscribe(sender.getClient());
+			if (receiver.getClient().getNotifiable())
+				receiver.subscribe(sender.getClient());
 			throw new DestinationIsBusyException();
 		} else {
 			int id = uniqueId();
-			InteractiveCommunication communication = new InteractiveCommunication(id, sender,
-					receiver, communicationType);
+			InteractiveCommunication communication = new InteractiveCommunication(id, sender, receiver,
+					communicationType);
 			_communications.put(id, communication);
 			receiver.addCommunication(communication);
 			sender.addCommunication(communication);
@@ -694,6 +752,17 @@ public class Network implements Serializable {
 		}
 	}
 
+
+	/**
+	 * End an interactive communication
+	 * @param sender Terminal ending the communication
+	 * @param duration Duration of the communication
+	 * @throws NoOngoingCommunicationException if the terminal has no ongoing communication
+	 * @throws TerminalAlreadyOnException if the terminal is already on
+	 * @throws TerminalAlreadySilentException if the terminal is already silent
+	 * @throws TerminalAlreadyBusyException if the terminal is already busy
+	 * @throws TerminalAlreadyOffException if the terminal is already off
+	 */
 	public void endInteractiveCommunication(Terminal sender, Double duration)
 			throws NoOngoingCommunicationException, TerminalAlreadyOnException, TerminalAlreadySilentException,
 			TerminalAlreadyBusyException, TerminalAlreadyOffException {
