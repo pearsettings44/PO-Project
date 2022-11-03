@@ -8,7 +8,7 @@ public class NormalLevelClient extends Client.Level {
     }
 
     @Override
-    public String getName() {
+    public String getLevelName() {
         return "NORMAL";
     }
 }

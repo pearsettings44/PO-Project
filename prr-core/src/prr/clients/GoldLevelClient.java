@@ -8,7 +8,7 @@ public class GoldLevelClient extends Client.Level {
     }
 
     @Override
-    public String getName() {
+    public String getLevelName() {
         return "GOLD";
     }
 }

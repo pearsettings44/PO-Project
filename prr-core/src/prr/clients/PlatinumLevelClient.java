@@ -8,7 +8,7 @@ public class PlatinumLevelClient extends Client.Level {
     }
 
     @Override
-    public String getName() {
+    public String getLevelName() {
         return "PLATINUM";
     }
 }

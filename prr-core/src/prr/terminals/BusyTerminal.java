@@ -8,7 +8,7 @@ public class BusyTerminal extends Terminal.State {
     }
 
     @Override
-    public String getState() {
+    public String getStateName() {
         return "BUSY";
     }
 }

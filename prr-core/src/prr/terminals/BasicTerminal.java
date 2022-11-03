@@ -1,14 +1,16 @@
 package prr.terminals;
 
+import prr.clients.Client;
+
 public class BasicTerminal extends Terminal {
     private String _type = "BASIC";
 
-    public BasicTerminal(String key, String clientKey) {
-        super(key, clientKey);
+    public BasicTerminal(String key, Client client) {
+        super(key, client);
     }
 
-    public BasicTerminal(String key, String clientKey, String state) {
-        super(key, clientKey, state);
+    public BasicTerminal(String key, Client client, String state) {
+        super(key, client, state);
     }
 
     /**
@@ -22,7 +24,7 @@ public class BasicTerminal extends Terminal {
 
     @Override
     public String toString() {
-        return String.format("%s|%s|%s|%s|%d|%d%s", getType(), getKey(), getClient(),
+        return String.format("%s|%s|%s|%s|%d|%d%s", getType(), getKey(), getClient().getKey(),
                 getState(), Math.round(getPayments()),
                 Math.round(getDebts()), hasFriends() ? "|" + friendsToString() : "");
     }

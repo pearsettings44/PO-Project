@@ -8,7 +8,7 @@ public class IdleTerminal extends Terminal.State {
     }
 
     @Override
-    public String getState() {
+    public String getStateName() {
         return "IDLE";
     }
 }

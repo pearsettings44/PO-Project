@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import prr.clients.Client;
+import prr.communications.Communication;
+import prr.exceptions.NoOngoingCommunicationException;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
 
@@ -20,19 +22,23 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         private String _key;
 
         /** Total payments made by this terminal. */
-        private float _payments;
+        private long _payments;
 
         /** Total debts of this terminal. */
-        private float _debts;
+        private long _debts;
 
         /** The terminal's owner */
-        private String _client;
+        private Client _client;
 
         /** The terminal's state */
         private State _state;
 
+        private String _prevState = "";
+
         /** The terminal's friends */
         private Map<String, Terminal> _friends = new TreeMap<>();
+
+        private Map<Integer, Communication> _communications = new TreeMap<>();
 
         /**
          * Constructor.
@@ -40,7 +46,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @param key    the terminal's key
          * @param client the terminal's owner
          */
-        public Terminal(String key, String client) {
+        public Terminal(String key, Client client) {
                 _key = key;
                 _client = client;
                 _payments = 0;
@@ -56,7 +62,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @param client the terminal's owner
          * @param state  the terminal's state
          */
-        public Terminal(String key, String client, String state) {
+        public Terminal(String key, Client client, String state) {
                 _key = key;
                 _client = client;
                 _payments = 0;
@@ -89,7 +95,7 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         /**
          * @return the terminal's owner
          */
-        public String getClient() {
+        public Client getClient() {
                 return _client;
         }
 
@@ -97,21 +103,29 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return the terminal's state
          */
         public String getState() {
-                return _state.getState();
+                return _state.getStateName();
         }
 
         /**
          * @return the terminal's payments
          */
-        public float getPayments() {
+        public long getPayments() {
                 return _payments;
+        }
+
+        public void addPayment(long payment) {
+                _payments += payment;
         }
 
         /**
          * @return the terminal's debts
          */
-        public float getDebts() {
+        public long getDebts() {
                 return _debts;
+        }
+
+        public void addDebt(long debt) {
+                _debts += debt;
         }
 
         /**
@@ -127,6 +141,34 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         public Map<String, Terminal> getFriends() {
                 return _friends;
         }
+
+        public void setPrevState(String state) {
+                _prevState = state;
+        }
+
+        public String getPrevState() {
+                return _prevState;
+        }
+
+        public void addCommunication(Communication communication) {
+                _communications.put(communication.getId(), communication);
+        }
+
+        public Communication getOngoingCommunication() throws NoOngoingCommunicationException {
+                for (Communication c : _communications.values())
+                        if (!c.isFinished())
+                                return c;
+                throw new NoOngoingCommunicationException();
+        }
+
+        public long getLastInteractiveCommunicationPrice() {
+                Communication last = null;
+                for (Communication c : _communications.values())
+                        if ((c.getType().equals("VIDEO") || c.getType().equals("VOICE")) && c.isFinished())
+                                last = c;
+                return (long)last.getPrice();
+        }
+
 
         /**
          * Gets the terminal's friend's keys formatted as a string.
@@ -172,8 +214,37 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
         public abstract class State implements Serializable {
                 private static final long serialVersionUID = 202210151200L;
 
-                public abstract String getState();
+                public abstract String getStateName();
         }
+
+        /**
+         * Set the terminal's state
+         */
+        public void setState(State state) {
+                Terminal.this._state = state;
+        }
+
+        public Map<Integer, Communication> getSentCommunications() {
+                Map<Integer, Communication> sentCommunications = new TreeMap<>();
+                for (Communication communication : _communications.values()) {
+                        if (communication.getSender().equals(this)) {
+                                sentCommunications.put(communication.getId(), communication);
+                        }
+                }
+                return sentCommunications;
+        }
+
+        public Map<Integer, Communication> getReceivedCommunications() {
+                Map<Integer, Communication> receivedCommunications = new TreeMap<>();
+                for (Communication communication : _communications.values()) {
+                        if (communication.getReceiver().equals(this)) {
+                                receivedCommunications.put(communication.getId(), communication);
+                        }
+                }
+                return receivedCommunications;
+        }
+
+        abstract public String getType();
 
         /**
          * Checks if this terminal can end the current interactive communication.
@@ -183,8 +254,11 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          *         it was the originator of this communication.
          **/
         public boolean canEndCurrentCommunication() {
-                // FIXME add implementation code
-                // so para correr
+                if (!(getState().equals("BUSY")))
+                        return false;
+                for (Communication communication : _communications.values())
+                        if (communication.getSender().getKey().equals(getKey()) && !communication.isFinished())
+                                return true;
                 return false;
         }
 
@@ -194,8 +268,6 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
          * @return true if this terminal is neither off neither busy, false otherwise.
          **/
         public boolean canStartCommunication() {
-                // FIXME add implementation code
-                // so para correr
-                return true;
+                return !(getState().equals("OFF")) && !(getState().equals("BUSY"));
         }
 }

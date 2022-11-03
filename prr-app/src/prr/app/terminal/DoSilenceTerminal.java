@@ -16,6 +16,10 @@ class DoSilenceTerminal extends TerminalCommand {
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+        try {
+			_network.turnTerminalSilent(_receiver);
+		} catch (prr.exceptions.TerminalAlreadySilentException e) {
+			_display.popup(Message.alreadySilent());
+		}
 	}
 }

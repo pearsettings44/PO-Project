@@ -1,9 +1,13 @@
 package prr.clients;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import prr.TarrifPlans.BaseTarrifPlan;
+import prr.TarrifPlans.TarrifPlan;
+import prr.communications.Communication;
 import prr.terminals.Terminal;
 
 public class Client implements Serializable {
@@ -35,6 +39,8 @@ public class Client implements Serializable {
     /** Client terminals */
     private Map<String, Terminal> _terminals;
 
+    private TarrifPlan _tarrifPlan;
+
     /**
      * Constructor.
      * 
@@ -54,6 +60,7 @@ public class Client implements Serializable {
         _debts = 0;
         _notifiable = true;
         _terminals = new TreeMap<>();
+        _tarrifPlan = new BaseTarrifPlan();
     }
 
     /**
@@ -61,6 +68,10 @@ public class Client implements Serializable {
      */
     public String getKey() {
         return _key;
+    }
+
+    public TarrifPlan getTarrifPlan() {
+        return _tarrifPlan;
     }
 
     /**
@@ -133,16 +144,36 @@ public class Client implements Serializable {
         return _terminals.get(key);
     }
 
+    public Level getLevel() {
+        return _level;
+    }
+
+    public Collection<Communication> getSentCommunications() {
+        Map<Integer, Communication> communications = new TreeMap<>();
+        for (Terminal terminal : _terminals.values()) {
+            communications.putAll(terminal.getSentCommunications());
+        }
+        return communications.values();
+    }
+
+    public Collection<Communication> getReceivedCommunications() {
+        Map<Integer, Communication> communications = new TreeMap<>();
+        for (Terminal terminal : _terminals.values()) {
+            communications.putAll(terminal.getReceivedCommunications());
+        }
+        return communications.values();
+    }
+
     public abstract class Level implements Serializable {
         private static final long serialVersionUID = 202210121157L;
 
-        public abstract String getName();
+        public abstract String getLevelName();
     }
 
     @Override
     public String toString() {
         return String.format("CLIENT|%s|%s|%d|%s|%s|%d|%d|%d", _key, _name, _taxId,
-                _level.getName(), _notifiable ? "YES" : "NO",
+                _level.getLevelName(), _notifiable ? "YES" : "NO",
                 numberOfTerminals(), Math.round(_payments),
                 Math.round(_debts));
     }

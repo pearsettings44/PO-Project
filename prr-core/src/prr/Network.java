@@ -6,13 +6,26 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import prr.clients.Client;
+import prr.communications.Communication;
+import prr.communications.InteractiveCommunication;
+import prr.communications.TextCommunication;
 import prr.exceptions.ClientNotificationsAlreadyEnabledException;
+import prr.exceptions.DestinationIsBusyException;
+import prr.exceptions.DestinationIsOffException;
+import prr.exceptions.DestinationIsSilentException;
 import prr.exceptions.ClientNotificationsAlreadyDisabledException;
 import prr.exceptions.DuplicateClientKeyException;
 import prr.exceptions.DuplicateTerminalKeyException;
 import prr.exceptions.IllegalEntryException;
 import prr.exceptions.InvalidTerminalKeyException;
+import prr.exceptions.NoOngoingCommunicationException;
+import prr.exceptions.TerminalAlreadyBusyException;
+import prr.exceptions.TerminalAlreadyOffException;
+import prr.exceptions.TerminalAlreadyOnException;
+import prr.exceptions.TerminalAlreadySilentException;
 import prr.exceptions.UnrecognizedEntryException;
+import prr.exceptions.UnsupportedAtDestinationException;
+import prr.exceptions.UnsupportedAtOriginException;
 import prr.exceptions.UnknownClientKeyException;
 import prr.exceptions.UnknownTerminalKeyException;
 
@@ -26,7 +39,11 @@ import java.util.TreeMap;
 
 import prr.terminals.Terminal;
 import prr.terminals.BasicTerminal;
+import prr.terminals.BusyTerminal;
 import prr.terminals.FancyTerminal;
+import prr.terminals.IdleTerminal;
+import prr.terminals.OffTerminal;
+import prr.terminals.SilenceTerminal;
 
 /**
  * Class Network implements a network.
@@ -43,6 +60,9 @@ public class Network implements Serializable {
 	private Map<String, Terminal> _terminals = new TreeMap<>();
 
 	private Map<Integer, Communication> _communications = new TreeMap<>();
+
+	/* Communication unique Id */
+	private int _uniqueId = 1;
 
 	/**
 	 * Network's dirty state, which represents if the network was modified since
@@ -71,6 +91,15 @@ public class Network implements Serializable {
 	 */
 	private void dirty() {
 		_dirty = true;
+	}
+
+	/**
+	 * Get and unique Id
+	 * 
+	 * @return the unique Id
+	 */
+	int uniqueId() {
+		return _uniqueId++;
 	}
 
 	/**
@@ -114,6 +143,13 @@ public class Network implements Serializable {
 	 */
 	public Collection<Terminal> terminals() {
 		return _terminals.values();
+	}
+
+	/**
+	 * @return all communications
+	 */
+	public Collection<Communication> communications() {
+		return _communications.values();
 	}
 
 	/**
@@ -240,11 +276,11 @@ public class Network implements Serializable {
 		if (!key.matches("[0-9]+") || key.length() != 6)
 			throw new InvalidTerminalKeyException(key);
 		if (type.equals("BASIC")) {
-			Terminal terminal = new BasicTerminal(key, clientKey);
+			Terminal terminal = new BasicTerminal(key, getClient(clientKey));
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
 		} else if (type.equals("FANCY")) {
-			Terminal terminal = new FancyTerminal(key, clientKey);
+			Terminal terminal = new FancyTerminal(key, getClient(clientKey));
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
 		} else
@@ -269,11 +305,11 @@ public class Network implements Serializable {
 		if (key.length() != 6)
 			throw new InvalidTerminalKeyException(key);
 		if (type.equals("BASIC")) {
-			Terminal terminal = new BasicTerminal(key, clientKey, state);
+			Terminal terminal = new BasicTerminal(key, getClient(clientKey), state);
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
 		} else {
-			Terminal terminal = new FancyTerminal(key, clientKey, state);
+			Terminal terminal = new FancyTerminal(key, getClient(clientKey), state);
 			this._terminals.put(key, terminal);
 			_clients.get(clientKey).addTerminal(terminal);
 		}
@@ -439,5 +475,190 @@ public class Network implements Serializable {
 	 */
 	public long getClientPayments(String key) throws UnknownClientKeyException {
 		return (long) getClient(key).getPayments();
+	}
+
+	/**
+	 * Turn a terminal off
+	 * 
+	 * @param terminal Terminal to turn of
+	 * @throws TerminalAlreadyOffException if the terminal is already off
+	 */
+	public void turnTerminalOff(Terminal terminal) throws TerminalAlreadyOffException {
+		String terminalState = terminal.getState();
+		if (terminalState.equals("OFF"))
+			throw new TerminalAlreadyOffException();
+		terminal.setPrevState(terminalState);
+		terminal.setState(new OffTerminal(terminal));
+		this.dirty();
+	}
+
+	/**
+	 * Turn a terminal on
+	 * 
+	 * @param terminal Terminal to turn on
+	 * @throws TerminalAlreadyOnException if the terminal is already on
+	 */
+	public void turnTerminalOn(Terminal terminal) throws TerminalAlreadyOnException {
+		String terminalState = terminal.getState();
+		if (terminalState.equals("IDLE"))
+			throw new TerminalAlreadyOnException();
+		terminal.setPrevState(terminalState);
+		terminal.setState(new IdleTerminal(terminal));
+		this.dirty();
+	}
+
+	/**
+	 * Turn a terminal silent
+	 * 
+	 * @param terminal Terminal to turn silent
+	 * @throws TerminalAlreadySilentException if the terminal is already silent
+	 */
+	public void turnTerminalSilent(Terminal terminal) throws TerminalAlreadySilentException {
+		String terminalState = terminal.getState();
+		if (terminalState.equals("SILENCE"))
+			throw new TerminalAlreadySilentException();
+		terminal.setPrevState(terminalState);
+		terminal.setState(new SilenceTerminal(terminal));
+		this.dirty();
+	}
+
+	/**
+	 * Turn a terminal busy
+	 * 
+	 * @param terminal Terminal to turn busy
+	 * @throws TerminalAlreadyBusyException if the terminal is already busy
+	 */
+	public void turnTerminalBusy(Terminal terminal) throws TerminalAlreadyBusyException {
+		String terminalState = terminal.getState();
+		if (terminalState.equals("BUSY"))
+			throw new TerminalAlreadyBusyException();
+		terminal.setPrevState(terminalState);
+		terminal.setState(new BusyTerminal(terminal));
+		this.dirty();
+	}
+
+	/**
+	 * Turn a terminal to the previous state
+	 * 
+	 * @param terminal Terminal to turn to the previous state
+	 * @throws TerminalAlreadyOnException     if the terminal is already on
+	 * @throws TerminalAlreadyOffException    if the terminal is already off
+	 * @throws TerminalAlreadySilentException if the terminal is already silent
+	 * @throws TerminalAlreadyBusyException   if the terminal is already busy
+	 */
+	public void turnTerminalPrevState(Terminal terminal) throws TerminalAlreadyOnException, TerminalAlreadyOffException,
+			TerminalAlreadySilentException, TerminalAlreadyBusyException {
+		String prevStateName = terminal.getPrevState();
+		switch (prevStateName) {
+			case "IDLE":
+				terminal.setState(new IdleTerminal(terminal));
+				break;
+			case "BUSY":
+				terminal.setState(new BusyTerminal(terminal));
+				break;
+			case "SILENCE":
+				terminal.setState(new SilenceTerminal(terminal));
+				break;
+			case "OFF":
+				terminal.setState(new OffTerminal(terminal));
+				break;
+		}
+		this.dirty();
+	}
+
+	public Collection<Communication> communicationsFromClient(String key) throws UnknownClientKeyException {
+		return getClient(key).getSentCommunications();
+	}
+
+	public Collection<Communication> communicationsToClient(String key) throws UnknownClientKeyException {
+		return getClient(key).getReceivedCommunications();
+	}
+
+	/**
+	 * Send a text communication to a terminal
+	 * 
+	 * @param originTerminal         Terminal sending the communication
+	 * @param destinationTerminalKey Key of the destination terminal
+	 * @param message                Message to send
+	 */
+	public void sendTextCommunication(Terminal sender, String receiverKey, String message)
+			throws UnknownTerminalKeyException, DestinationIsOffException {
+		Terminal receiver = getTerminal(receiverKey);
+		if (receiver.getState().equals("OFF"))
+			throw new DestinationIsOffException();
+		else {
+			int id = uniqueId();
+			TextCommunication communication = new TextCommunication(
+					id, sender, receiver, message);
+			double price = communication.calculatePrice();
+			communication.setPrice(price);
+			sender.addDebt((long) price);
+			_communications.put(id, communication);
+			receiver.addCommunication(communication);
+			sender.addCommunication(communication);
+			this.dirty();
+		}
+	}
+
+	/**
+	 * Start an interactive communication with a terminal
+	 * 
+	 * @param originTerminal         Terminal starting the communication
+	 * @param destinationTerminalKey Key of the destination terminal
+	 * @param communicationType      Type of the communication
+	 * @throws UnknownTerminalKeyException       if the destination terminal key
+	 *                                           does not exist
+	 * @throws UnsupportedAtOriginException      if the communication type is not
+	 *                                           supported at the origin terminal
+	 * @throws UnsupportedAtDestinationException if the communication type is not
+	 *                                           supported at the destination
+	 *                                           terminal
+	 * @throws DestinationIsOffException         if the destination terminal is off
+	 * @throws DestinationIsSilentException      if the destination terminal is
+	 *                                           silent
+	 * @throws DestinationIsBusyException        if the destination terminal is busy
+	 */
+	public void startInteractiveCommunication(Terminal sender, String receiverKey,
+			String communicationType) throws UnknownTerminalKeyException, UnsupportedAtOriginException,
+			UnsupportedAtDestinationException, DestinationIsOffException, DestinationIsSilentException,
+			DestinationIsBusyException, TerminalAlreadyBusyException {
+		Terminal receiver = getTerminal(receiverKey);
+		String receiverState = receiver.getState();
+		if (sender.getType().equals("BASIC") && communicationType.equals("VIDEO"))
+			throw new UnsupportedAtOriginException();
+		else if (receiver.getType().equals("BASIC") && communicationType.equals("VIDEO"))
+			throw new UnsupportedAtDestinationException();
+		else if (receiverState.equals("OFF"))
+			throw new DestinationIsOffException();
+		else if (receiverState.equals("SILENCE"))
+			throw new DestinationIsSilentException();
+		else if (receiverState.equals("BUSY"))
+			throw new DestinationIsBusyException();
+		else {
+			int id = uniqueId();
+			InteractiveCommunication communication = new InteractiveCommunication(id, sender,
+					receiver, communicationType);
+			_communications.put(id, communication);
+			receiver.addCommunication(communication);
+			sender.addCommunication(communication);
+			turnTerminalBusy(sender);
+			turnTerminalBusy(receiver);
+			this.dirty();
+		}
+	}
+
+	public void endInteractiveCommunication(Terminal sender, Double duration)
+			throws NoOngoingCommunicationException, TerminalAlreadyOnException, TerminalAlreadySilentException,
+			TerminalAlreadyBusyException, TerminalAlreadyOffException {
+		InteractiveCommunication communication = (InteractiveCommunication) sender.getOngoingCommunication();
+		communication.setFinished();
+		communication.setDuration(duration);
+		communication.setUnits(duration);
+		double price = communication.calculatePrice();
+		communication.setPrice(price);
+		sender.addDebt((long) price);
+		turnTerminalPrevState(sender);
+		turnTerminalPrevState(communication.getReceiver());
+		this.dirty();
 	}
 }

@@ -12,8 +12,8 @@ abstract public class Communication implements Serializable{
     private Terminal _receiver;
     private boolean _isFinished;
     private boolean _isPaid;
-    private float _price;
-    private float _units;
+    private double _price;
+    private double _units;
 
     public Communication(int id, Terminal sender, Terminal receiver){
         _id = id;
@@ -43,11 +43,21 @@ abstract public class Communication implements Serializable{
         return _receiver;
     }
 
-    public float getPrice(){
+    public double getPrice(){
         return _price;
     }
     
-    public float getUnits(){
+    public double getUnits(){
         return _units;
     }
+
+    public void setUnits(double units){
+        _units = units;
+    }
+
+    public void setPrice(double price) {
+        _price = price;
+    }
+
+    public abstract String getType();
 }
