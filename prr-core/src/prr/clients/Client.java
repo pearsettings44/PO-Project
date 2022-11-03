@@ -56,8 +56,6 @@ public class Client implements Serializable {
         _name = name;
         _taxId = taxId;
         _level = new NormalLevelClient(this);
-        _payments = 0;
-        _debts = 0;
         _notifiable = true;
         _terminals = new TreeMap<>();
         _tarrifPlan = new BaseTarrifPlan();
@@ -92,14 +90,21 @@ public class Client implements Serializable {
      * @return the total payments made by this client
      */
     public float getPayments() {
-        return _payments;
+        float payments = 0;
+        for (Terminal terminal : _terminals.values())
+            payments += terminal.getPayments();
+        return payments;
     }
 
     /**
      * @return the total debts of this client
      */
     public float getDebts() {
-        return _debts;
+        // get the debt of all terminals
+        float debt = 0;
+        for (Terminal terminal : _terminals.values())
+            debt += terminal.getDebts();
+        return debt;
     }
 
     /**
@@ -148,6 +153,10 @@ public class Client implements Serializable {
         return _level;
     }
 
+    public void setLevel(Level level) {
+        _level = level;
+    }
+
     public Collection<Communication> getSentCommunications() {
         Map<Integer, Communication> communications = new TreeMap<>();
         for (Terminal terminal : _terminals.values()) {
@@ -164,17 +173,42 @@ public class Client implements Serializable {
         return communications.values();
     }
 
+    public void tryLevelUp() {
+        _level.tryForPromotion();
+    }
+
+    public void tryLevelDown() {
+        _level.tryForDemotion();
+    }
+
     public abstract class Level implements Serializable {
         private static final long serialVersionUID = 202210121157L;
 
         public abstract String getLevelName();
+
+        public Client getClient() {
+            return Client.this;
+        }
+
+        public float getBalance() {
+            return Client.this.getPayments() - Client.this.getDebts();
+        }
+
+        protected void setLevel(Level level) {
+            Client.this._level = level;
+        }
+
+        abstract public void tryForPromotion();
+
+        abstract public void tryForDemotion();
+
     }
 
     @Override
     public String toString() {
         return String.format("CLIENT|%s|%s|%d|%s|%s|%d|%d|%d", _key, _name, _taxId,
                 _level.getLevelName(), _notifiable ? "YES" : "NO",
-                numberOfTerminals(), Math.round(_payments),
-                Math.round(_debts));
+                numberOfTerminals(), Math.round(getPayments()),
+                Math.round(getDebts()));
     }
 }

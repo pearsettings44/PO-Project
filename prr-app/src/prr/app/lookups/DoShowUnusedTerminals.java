@@ -16,6 +16,6 @@ class DoShowUnusedTerminals extends Command<Network> {
 
 	@Override
 	protected final void execute() throws CommandException {
-		_display.popup(_receiver.terminals());
+		_display.popup(_receiver.unusedTerminals());
 	}
 }

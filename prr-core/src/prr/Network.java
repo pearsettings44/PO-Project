@@ -146,6 +146,20 @@ public class Network implements Serializable {
 	}
 
 	/**
+	 * Get all terminais with any usage (no communications)
+	 * @return all terminals with any usage
+	 */
+	public Collection<Terminal> unusedTerminals() {
+		List<Terminal> unusedTerminals = new ArrayList<>();
+		for (Terminal terminal : _terminals.values()) {
+			if (terminal.hasNoCommunications()) {
+				unusedTerminals.add(terminal);
+			}
+		}
+		return unusedTerminals;
+	}
+
+	/**
 	 * @return all communications
 	 */
 	public Collection<Communication> communications() {
@@ -659,6 +673,9 @@ public class Network implements Serializable {
 		sender.addDebt((long) price);
 		turnTerminalPrevState(sender);
 		turnTerminalPrevState(communication.getReceiver());
+		Client senderClient = sender.getClient();
+		senderClient.tryLevelUp();
+		senderClient.tryLevelDown();
 		this.dirty();
 	}
 }

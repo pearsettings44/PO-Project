@@ -7,6 +7,16 @@ public class NormalLevelClient extends Client.Level {
         client.super();
     }
 
+    public void tryForPromotion() {
+        float balance = this.getBalance();
+        if (balance > 500)
+            this.setLevel(new GoldLevelClient(this.getClient()));
+    }
+
+    public void tryForDemotion() {
+        return;
+    }
+
     @Override
     public String getLevelName() {
         return "NORMAL";

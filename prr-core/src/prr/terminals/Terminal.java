@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import prr.clients.Client;
 import prr.communications.Communication;
+import prr.exceptions.InvalidCommunicationException;
 import prr.exceptions.NoOngoingCommunicationException;
 
 // FIXME add more import if needed (cannot import from pt.tecnico or prr.app)
@@ -150,6 +151,29 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 return _prevState;
         }
 
+        public boolean hasNoCommunications() {
+                return _communications.isEmpty();
+        }
+
+        public Communication getCommunication(int id) {
+                return _communications.get(id);
+        }
+
+        public void performPayment(int id) throws InvalidCommunicationException {
+                Communication communication = _communications.get(id);
+                if (communication == null)
+                        throw new InvalidCommunicationException();
+                if (!communication.getSender().getKey().equals(getKey()) || communication.isFinished() == false
+                                || communication.isPaid() == true)
+                        throw new InvalidCommunicationException();
+                communication.setPaid();
+                addPayment((long) communication.getPrice());
+                addDebt(-(long) communication.getPrice());
+                Client client = getClient();
+                client.tryLevelUp();
+                client.tryLevelDown();
+        }
+
         public void addCommunication(Communication communication) {
                 _communications.put(communication.getId(), communication);
         }
@@ -166,9 +190,8 @@ abstract public class Terminal implements Serializable /* FIXME maybe addd more 
                 for (Communication c : _communications.values())
                         if ((c.getType().equals("VIDEO") || c.getType().equals("VOICE")) && c.isFinished())
                                 last = c;
-                return (long)last.getPrice();
+                return (long) last.getPrice();
         }
-
 
         /**
          * Gets the terminal's friend's keys formatted as a string.

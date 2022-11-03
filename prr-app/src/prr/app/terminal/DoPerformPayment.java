@@ -12,11 +12,16 @@ class DoPerformPayment extends TerminalCommand {
 
 	DoPerformPayment(Network context, Terminal terminal) {
 		super(Label.PERFORM_PAYMENT, context, terminal);
-		//FIXME add command fields
+		addIntegerField("id", Prompt.commKey());
 	}
 
 	@Override
 	protected final void execute() throws CommandException {
-                //FIXME implement command
+        Integer id = integerField("id");
+		try {
+			_receiver.performPayment(id);
+		} catch (prr.exceptions.InvalidCommunicationException e) {
+			_display.popup(Message.invalidCommunication());
+		}
 	}
 }
