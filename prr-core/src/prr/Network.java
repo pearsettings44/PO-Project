@@ -501,6 +501,8 @@ public class Network implements Serializable {
 		String terminalState = terminal.getState();
 		if (terminalState.equals("OFF"))
 			throw new TerminalAlreadyOffException();
+		if (terminalState.equals("BUSY"))
+			return;
 		terminal.setPrevState(terminalState);
 		terminal.setState(new OffTerminal(terminal));
 		this.dirty();
@@ -546,6 +548,8 @@ public class Network implements Serializable {
 		String terminalState = terminal.getState();
 		if (terminalState.equals("BUSY"))
 			throw new TerminalAlreadyBusyException();
+		if (terminalState.equals("OFF"))
+			return;
 		terminal.setPrevState(terminalState);
 		terminal.setState(new BusyTerminal(terminal));
 		this.dirty();
